@@ -24,7 +24,7 @@ require "fortio-namelist"
 Usage
 -----------
 
-# Reading namelist format string
+### Reading namelist format string
 
 To create a Hash object with Namelist structure by reading a string in namelist format, use the following method.
 
@@ -87,7 +87,7 @@ Example:
     => {"group1"=>{"var1"=>11, "var2"=>12}, 
         "group3"=>{"var1"=>31, "var2"=>32}}
 
-# Generating namelist format string from Hash object with namelist structure
+### Generating namelist format string from Hash object with namelist structure
 
 To generate a namelist format string from a Hash object with namelist structure, use the following method.
 
