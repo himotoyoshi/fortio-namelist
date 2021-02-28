@@ -7,7 +7,7 @@ Features
 --------
 
 * Flexible parsing enables reading of namelists in various formats.
-* Various pptions are provided to output the namelist in the format of your choice.
+* Various options to control the output namelist string in the format of your choice.
 * Able to convert namelist format to JSON or YAML format using Ruby's standard library
 
 Installation
@@ -30,7 +30,7 @@ To create a Hash object with Namelist structure by reading a string in namelist 
 
     FortIO::Namelist.read(input, group: nil)
 
-The argument `input` is given as a string, but it also accepts objects that have a conversion method #read to a string (such as IO object). 
+The argument `input` is given as a string, but it also accepts objects with a method `#read` returns a string like an IO object. 
 
 If the keyword argument `group` is omitted, all namelist groups included in `input` will be read. To read only a specific group, give a group name to `group`. To load multiple groups, give an array of group names to `group`.
 
@@ -51,7 +51,7 @@ The Hash object of the return value has a two-level structure as follows.
           :
     }
 
-The value will be one of Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case of an array, it will be an Array object with the above objects as elements.
+Group names and variable names are given as String objects. The value is Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case of an array, it will be an Array object with the above objects as elements.
 
 Example:
 
@@ -89,11 +89,11 @@ Example:
 
 ### Generating namelist format string from Hash object with namelist structure
 
-To generate a namelist format string from a Hash object with namelist structure, use the following method.
+To generate a namelist format string from a Hash object with a namelist structure, use the following method.
 
     FortIO::Namelist.dump(root, **format_options)
 
-The argument `root` is given as a Hash object. The return value is a string in namelist format. You can finely control the output namelist string with the following keyword arguments (first one is default).
+The argument `root` is given as a Hash object. The return value is a string in namelist format. You can finely control the output namelist string with the following keyword arguments (the first one is the default).
 
     array_style:    'stream'
                     'index'   
