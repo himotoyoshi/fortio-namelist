@@ -105,7 +105,7 @@ describe FortIO::Namelist do
     is_asserted_by { nml["example"]["v3"] == "string"  }
   end
 
-  example "no quotation mark" do 
+  example "without quotation mark" do 
     input = %{
 &example
   v1 = string
@@ -177,6 +177,20 @@ describe FortIO::Namelist do
     is_asserted_by { nml["example"].is_a? Hash  }
     is_asserted_by { nml["example"]["v1"] == 1+1i  }
     is_asserted_by { nml["example"]["v2"] == 1+1i  }
+  end
+
+  example "nil asign" do 
+    input = %{
+&example
+  v1 = ,
+  v2 = ,
+/
+    }
+    nml = FortIO::Namelist.read(input)
+    is_asserted_by { nml.has_key? "example"  }
+    is_asserted_by { nml["example"].is_a? Hash  }
+    is_asserted_by { nml["example"]["v1"] == ""  }
+    is_asserted_by { nml["example"]["v2"] == ""  }
   end
 
 end
