@@ -14,91 +14,98 @@
 
 class FortIO::Namelist::Parser
 
-prechigh
-  left '='
-  left ','
-  nonassoc COMMA
-  nonassoc NL
-preclow
-
 rule
 
-  namelist_all : 
-               | namelist
-               | namelist namelist_all
-
   namelist : 
-                 header tailer 
-                           { @root[val[0]] = []; @scan.in_namelist = nil }
-               | header paramlist tailer 
-                           { @root[val[0]] = val[1]; @scan.in_namelist = nil }
+                 namelist group
+               | group
 
-  prefix :       '&' 
+  group : 
+                 group_header separator varlist separator group_end
+                           { @root[val[0]] = val[2]; @scan.in_namelist = nil }
+               | group_header separator group_end
+                           { @root[val[0]] = []; @scan.in_namelist = nil }
+
+  group_prefix : 
+                 '&' 
                | '$'
 
-  header :     
-                 prefix IDENT { result = val[1].downcase; @scan.in_namelist = val[1].downcase }
-               | header NL
+  group_header :     
+                 group_prefix IDENT 
+                           { result = val[1].downcase; @scan.in_namelist = val[1].downcase }
 
-  tailer :
+  separator: 
+                 COMMA
+               | nls
+               | blank
+
+  nls : 
+                 NL
+               | nls NL
+               
+  blank: 
+
+  group_end :    
                  '/'
-               | prefix IDENT { raise Racc::ParseError, "\nparse error (&)" unless val[1] =~ /\Aend\Z/i }
+               | group_prefix IDENT 
+                           { raise Racc::ParseError, "\nparse error (&)" unless val[1] =~ /\Aend\Z/i }
 
-  separator:     COMMA
-               | NL  
+  varlist: 
+                 vardef    { result = [val[0]] }
+               | varlist separator vardef
+                           { result = val[0] + [val[2]] }
 
-  paramlist:
-                 paramdef  { result = [val[0]] }
-               | paramlist paramdef
-                           { result = val[0] + [val[1]] }
-               | paramlist separator
-                           { result = val[0] }
-
-  paramdef:  
-                 IDENT '=' separator
-                           { result = ParamDef.new(val[0].downcase, nil, "") }
-               | IDENT '=' NIL
+  vardef:  
+                 IDENT '=' COMMA
                            { result = ParamDef.new(val[0].downcase, nil, "") }
                | IDENT '=' rvalues 
                            { result = ParamDef.new(val[0].downcase, nil, val[2]) }
+               | IDENT '=' nls rvalues 
+                           { result = ParamDef.new(val[0].downcase, nil, val[3]) }
                | IDENT '(' array_spec ')' '=' rvalues  
                            { result = ParamDef.new(val[0].downcase, val[2], val[5]) }
 
-  rvalues :      
-                abbreb    { result = val[0] }
-               | rvalues abbreb      
-                           { result = val[0] + val[1] }
-               | rvalues ',' abbreb
-                           { result = val[0] + val[2] }
-               | rvalues NL abbreb
-                           { result = val[0] + val[2] }
-               | rvalues NIL
-                           { result = val[0] + [nil] }
-               | NIL rvalues 
-                           { result = [nil] + val[1] }
-               | ',' rvalues 
-                           { result = [nil] + val[1] }
-               | rvalues NL 
-                           { result = val[0] }
-               | IDENT
-                           { result = val[0] }
+  rvalues : 
+                rlist
+               | ident_list
 
-  abbreb :
-                 constant { result = [val[0]] }
+  rlist : 
+                 element
+               | NIL       { result = [nil, nil] }
+               | rlist element
+                           { result = val[0] + val[1] }
+               | rlist ',' element
+                           { result = val[0] + val[2] }
+               | rlist NIL
+                           { result = val[0] + [nil] }
+
+  element :
+                 constant  { result = [val[0]] }
                | DIGITS '*' constant
-                          { result = [val[2]] * val[0] }
+                           { result = [val[2]] * val[0] }
 
   constant :
                  STRING
                | LOGICAL
-               | DIGITS
-               | FLOAT
+               | real
                | complex
 
-  real :         DIGITS
+  real :
+                 DIGITS
                | FLOAT
 
-  complex :      '(' real ',' real ')' { result = Complex(val[1],val[3]) }
+  complex :
+                '(' real ',' real ')' 
+                           { result = Complex(val[1],val[3]) }
+  
+  ident_list : 
+                 IDENT     { result = [val[0]] }
+               | STRINGLIKE
+                           { result = [val[0]] }
+               | ident_list ',' IDENT 
+                           { result = val[0] + [val[2]]}
+               | ident_list ',' STRINGLIKE
+                           { result = val[0] + [val[2]]}
 
   array_spec :
                  DIGITS    { result = [val[0]-1] }
@@ -184,6 +191,21 @@ module FortIO::Namelist
           end       
         else
           case
+          when @s.scan(/\A\(/)
+            return [
+              '(',
+              nil
+            ]
+          when @s.scan(/\A\)/)
+            return [
+              ')',
+              nil
+            ]
+          when @s.scan(/\A\:/)
+            return [
+              ':',
+              nil
+            ]
           when @s.scan(/\A[+-]?(\d+)\.(\d+)?([ED][+-]?(\d+))?/i) ### float
             return [                              ### 1.2E+3, 1.E+3, 1.2E3
               :FLOAT,                             ### 1.2, 1.
@@ -199,9 +221,9 @@ module FortIO::Namelist
               :FLOAT, 
               @s[0].sub(/D/i,'e').to_f
             ]
-          when @s.scan(/\A\d+[a-z_]\w*/i)         ### STRING
+          when @s.scan(/\A\d+[a-z_]\w*/i)         ### STRING-Like
             return [
-              :STRING,
+              :STRINGLIKE,
               @s[0]
             ]
           when @s.scan(/\A[\-\+]?\d+/)            ### digits
@@ -229,6 +251,11 @@ module FortIO::Namelist
                 ',',
                 nil
               ]
+            elsif @s.match?(/\A[a-z]\w*\s*,/i) 
+              return [
+                ',', 
+                nil
+              ]
             elsif @s.match?(/\A[a-z]\w*/i) or @s.match?(/\A[\&\$\/\!]/)
               return [
                 :COMMA, 
@@ -252,9 +279,9 @@ module FortIO::Namelist
               @s[0], 
               nil
             ]
-          when @s.scan(/\A_\w*/i)                 ### STRING
+          when @s.scan(/\A_\w*/i)                 ### STRING-Like
             return [
-              :STRING,
+              :STRINGLIKE,
               @s[0]
             ]
           when @s.scan(/\A\.t.*?\./i)             ### LOGICAL true

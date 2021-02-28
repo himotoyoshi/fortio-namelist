@@ -72,22 +72,14 @@ module FortIO::Namelist
       @namelist = FortIO::Namelist::Parser.new.parse(text)
     end
   
-    def read (name, out={})
-      name = name.downcase
-      raise "no definition of namelist '#{name}'" unless nml = @namelist[name]
+    def read (group, out={})
+      group = group.downcase
+      raise "no definition of namelist group '#{group}'" \
+                                        unless nml = @namelist[group]
       nml.each do |paramdef|
         paramdef.set(out)
       end
       return out
-    end
-
-    def read_all 
-      all = {}
-      @namelist.each do |name, nml|
-        all[name] = {}
-        read(name, all[name])
-      end
-      return all
     end
 
     attr_reader :namelist
@@ -100,12 +92,15 @@ module FortIO::Namelist
   #
   
   #
-  # FortIO::Namelist.dump(hash, name: "namelist")
+  # FortIO::Namelist.dump(hash, group: "namelist")
   #
   # hash -> namelist converter
   #
   
-  def self.format_element (value, logical_format: 'normal', float_format: 'normal', uppercase: false)
+  def self.format_element (value, 
+                           logical_format: 'normal', 
+                           float_format: 'normal', 
+                           uppercase: false)
     case value
     when String
       if value !~ /'/
@@ -154,12 +149,12 @@ module FortIO::Namelist
   end
   
   def self.generate (hash, 
-                     name: "namelist", 
+                     group: "group", 
                      array_style: "stream",
                      alignment: "left",
                      uppercase: false,
-                     comma: false,
-                     slash: true,
+                     separator: "comma",
+                     group_end: "/",
                      indent: '  ',
                      **format_options)
     format_options[:uppercase] = uppercase
@@ -177,7 +172,7 @@ module FortIO::Namelist
         when "stream"
           list << [ident, value.map{ |e| format_element(e, **format_options) }.join(", ")]
         else
-          raise "unknown array style (should be 'index' or 'stream')"
+          raise "invalid keyword argument `array_style` (should be 'index', 'stream')"  
         end
       else
         list << [ident, format_element(value, **format_options)]
@@ -185,12 +180,15 @@ module FortIO::Namelist
     end
     if uppercase 
       list = list.map{|ident,value| [ident.upcase, value]}
-      name = name.upcase
+      group = group.upcase
     end
-    if comma
+    case separator
+    when "comma", ","
       nl = ",\n"
-    else
+    when "nl", "\n"
       nl = "\n"
+    else
+      raise "invalid keyword argument `separator` (should be 'comma', ',', 'nl', '\n')"
     end
     case alignment
     when "none"
@@ -212,35 +210,48 @@ module FortIO::Namelist
         format("%s%-#{alignment-2}s = %s", indent, ident, value)
       }.join(nl)
     else
-      raise "unknown enum format (should be 'normal' 'left' 'right' 'stream')"            
+      raise "invalid keyword argument `alignment` (should be 'normal' 'left' 'right' 'stream')"  
     end
-    if slash
+    case group_end
+    when "slash", "/"
       tail = "/"
-    else
+    when "end"
       tail = "&end"
+    else
+      raise "invalid keyword argument `group_end` (should be 'slash', '/', 'end')"
     end
-    return ["&#{name}", body, tail, ""].join("\n")
+    return ["&#{group}", body, tail, ""].join("\n")
   end
 
   def self.dump (root, **format_options)
-    return root.map { |name, hash| generate(hash, name: name, **format_options) }.join
+    return root.map { |group, hash| generate(hash, group: group, **format_options) }.join
   end
 
   #
   #  FortIO::Namelist.read(input, name: nil) 
   #
-  def self.read (input, name: nil)
+  def self.read (input, group: nil)
     case input
     when String
       text = input
     else
       text = input.read
     end
-    if name
-      return FortIO::Namelist::Reader.new(text).read(name)
+    reader = FortIO::Namelist::Reader.new(text)
+    case group
+    when Array
+      groups = group
+    when String
+      groups = [group]
+    when nil
+      groups = reader.namelist.keys
     else
-      return FortIO::Namelist::Reader.new(text).read_all()
+      raise "invalid keyword arugment `group` '#{group.inspect}'"
     end
+    return groups.each_with_object({}) { |group, root|
+      root[group] = {}
+      reader.read(group, root[group])
+    }
   end
 
   #

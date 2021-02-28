@@ -74,8 +74,8 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml["example"]["t"] = 1 }
-    is_asserted_by { nml["example"]["f"] = 2 }
+    is_asserted_by { nml["example"]["t"] == 1 }
+    is_asserted_by { nml["example"]["f"] == 2 }
   end
 
 end
