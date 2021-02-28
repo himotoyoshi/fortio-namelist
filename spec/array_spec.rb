@@ -100,5 +100,19 @@ describe FortIO::Namelist do
     expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
   end
 
+  example "empty element" do 
+    input = %{
+&example
+  v1 = , , 3, , 5,
+  v2 = , , 3, , 5
+/
+    }
+    nml = FortIO::Namelist.read(input)
+    is_asserted_by { nml.has_key? "example"  }
+    is_asserted_by { nml["example"].is_a? Hash  }
+    is_asserted_by { nml["example"]["v1"] = [nil, nil, 3, nil, 5]  }
+    is_asserted_by { nml["example"]["v2"] = [nil, nil, 3, nil, 5]  }
+  end
+
 
 end

@@ -1,7 +1,14 @@
 fortio-namelist
 ===============
 
-This is a library for reading and writing data in Fortran namelist format. With this library, you can read Fortran namelist format data from Ruby and convert it to Hash objects, and vice versa. Once the namelist format is read as a Hash object, it is easy to modify the contents or convert it to another format such as JSON, YAML, etc. When converting from a Hash object to namelist format, options can be specified to specify the case of variable names and the format of logical values and floating point numbers. The namelist format is often used as a configuration file to control a calculation program using Fortran. This library can be especially useful for batch processing by sequentially changing the settings of a calculation program. It can also improve the appearance of the namelist output from a Fortran program to make it easier to check. Since the namelist format and JSON (or YAML) can be converted to each other, it is also a good idea to use it to create web interfaces that facilitate the configuration of programs.
+This is a library for reading and writing data in Fortran's namelist format. With this library, you can read Fortran's namelist format data from Ruby and convert it to Hash objects, and vice versa. 
+
+Features
+--------
+
+* Flexible parsing enables reading of namelists in various formats.
+* Various pptions are provided to output the namelist in the format of your choice.
+* Able to convert namelist format to JSON or YAML format using Ruby's standard library
 
 Installation
 ------------
@@ -14,49 +21,126 @@ To use the library in your Ruby script,
 require "fortio-namelist"
 ```
 
-Description
+Usage
 -----------
 
-# Reading namelist data 
+# Reading namelist format string
 
-    FortIO::Namelist.read(input, name: nil)
+To create a Hash object with Namelist structure by reading a string in namelist format, use the following method.
 
-# Generate namelist format from Hash object
+    FortIO::Namelist.read(input, group: nil)
 
-    FortIO::Namelist.generate(hash, name: "namelist", array_format: 'stream')
+The argument `input` is given as a string, but it also accepts objects that have a conversion method #read to a string (such as IO object). 
 
-# Generate namelist format string from Hash containing multiple datasets
+If the keyword argument `group` is omitted, all namelist groups included in `input` will be read. To read only a specific group, give a group name to `group`. To load multiple groups, give an array of group names to `group`.
+
+The Hash object of the return value has a two-level structure as follows.
+
+    {
+      "group1" => {
+         "var11" => value11,
+         "var12" => value12, 
+            :          :
+      }
+      "group2" => {
+         "var21" => value21,
+         "var22" => value22,
+            :          :
+      }
+          :        
+          :
+    }
+
+The value will be one of Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case of an array, it will be an Array object with the above objects as elements.
+
+Example:
+
+    require 'fortio-namelist'
+    
+    input = %{
+    &group1
+      var1 = 11
+      var2 = 12
+    /
+    &group2
+      var1 = 12
+      var2 = 22
+    /
+    &group3
+      var1 = 31
+      var2 = 32
+    /
+    }
+
+    ### read all groups
+    root = FortIO::Namelist.read(input)
+    => {"group1"=>{"var1"=>11, "var2"=>12},
+        "group2"=>{"var1"=>12, "var2"=>22},
+        "group3"=>{"var1"=>31, "var2"=>32}}
+    
+    ### read only "group2"
+    root = FortIO::Namelist.read(input, group: "group2")
+    => {"group2"=>{"var1"=>12, "var2"=>22}}
+    
+    ### read only "group1" and "group3"
+    root = FortIO::Namelist.read(input, group: ["group1", "group3"])
+    => {"group1"=>{"var1"=>11, "var2"=>12}, 
+        "group3"=>{"var1"=>31, "var2"=>32}}
+
+# Generating namelist format string from Hash object with namelist structure
+
+To generate a namelist format string from a Hash object with namelist structure, use the following method.
 
     FortIO::Namelist.dump(root, **format_options)
 
-# Reads namelist data, evaluates it with block, and converts the result to namelist
+The argument `root` is given as a Hash object. The return value is a string in namelist format. You can finely control the output namelist string with the following keyword arguments (first one is default).
 
-    FortIO::Namelist.filter(input, **format_options) { |hash| ... }
-
-# Format options accepted by generate, dump, and filter
-
-    array_style:    'index'   
-                    'stream'
-
+    array_style:    'stream'
+                    'index'   
+                    
     logical_format: 'normal'
                     'short'
 
     float_format:   'normal'
                     'd0'
 
-    alignment:      'compact'
-                    'left'
+    alignment:      'left'
                     'right'
+                    'compact'
                     Integer
 
     uppercase:      false
                     true
     
-    comma:          false
-                    true
-                    
-    slash:          true
-                    false
+    separator:      "nl", "\n"
+                    "comma", ","
+
+    group_end:      "slash", "/"
+                    "end"
                     
     indent:         ' '*2
-                    
+
+Example:
+
+    require 'fortio-namelist'
+
+    root = {"group1"=>{"var1"=>11, "var2"=>12},
+            "group2"=>{"var1"=>12, "var2"=>22},
+            "group3"=>{"var1"=>31, "var2"=>32}}
+    
+    puts FortIO::Namelist.dump(root)
+
+This script print a namelist format string to stdout.
+
+    &group1
+      var1 = 11
+      var2 = 12
+    /
+    &group2
+      var1 = 12
+      var2 = 22
+    /
+    &group3
+      var1 = 31
+      var2 = 32
+    /
