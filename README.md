@@ -56,37 +56,39 @@ Group names and variable names are given as String objects. The value is Ruby's 
 
 Example:
 
-    require 'fortio-namelist'
-    
-    input = %{
-    &group1
-      var1 = 11
-      var2 = 12
-    /
-    &group2
-      var1 = 12
-      var2 = 22
-    /
-    &group3
-      var1 = 31
-      var2 = 32
-    /
-    }
+```ruby
+require 'fortio-namelist'
 
-    ### read all groups
-    root = FortIO::Namelist.read(input)
-    => {"group1"=>{"var1"=>11, "var2"=>12},
-        "group2"=>{"var1"=>12, "var2"=>22},
-        "group3"=>{"var1"=>31, "var2"=>32}}
-    
-    ### read only "group2"
-    root = FortIO::Namelist.read(input, group: "group2")
-    => {"group2"=>{"var1"=>12, "var2"=>22}}
-    
-    ### read only "group1" and "group3"
-    root = FortIO::Namelist.read(input, group: ["group1", "group3"])
-    => {"group1"=>{"var1"=>11, "var2"=>12}, 
-        "group3"=>{"var1"=>31, "var2"=>32}}
+input = %{
+&group1
+  var1 = 11
+  var2 = 12
+/
+&group2
+  var1 = 12
+  var2 = 22
+/
+&group3
+  var1 = 31
+  var2 = 32
+/
+}
+
+### read all groups
+root = FortIO::Namelist.read(input)
+=> {"group1"=>{"var1"=>11, "var2"=>12},
+    "group2"=>{"var1"=>12, "var2"=>22},
+    "group3"=>{"var1"=>31, "var2"=>32}}
+
+### read only "group2"
+root = FortIO::Namelist.read(input, group: "group2")
+=> {"group2"=>{"var1"=>12, "var2"=>22}}
+
+### read only "group1" and "group3"
+root = FortIO::Namelist.read(input, group: ["group1", "group3"])
+=> {"group1"=>{"var1"=>11, "var2"=>12}, 
+    "group3"=>{"var1"=>31, "var2"=>32}}
+```
 
 ### Generating namelist format string from Hash object with namelist structure
 
@@ -123,13 +125,15 @@ The argument `root` is given as a Hash object. The return value is a string in n
 
 Example:
 
-    require 'fortio-namelist'
+```ruby
+require 'fortio-namelist'
 
-    root = {"group1"=>{"var1"=>11, "var2"=>12},
-            "group2"=>{"var1"=>12, "var2"=>22},
-            "group3"=>{"var1"=>31, "var2"=>32}}
-    
-    puts FortIO::Namelist.dump(root)
+root = {"group1"=>{"var1"=>11, "var2"=>12},
+        "group2"=>{"var1"=>12, "var2"=>22},
+        "group3"=>{"var1"=>31, "var2"=>32}}
+
+puts FortIO::Namelist.dump(root)
+```
 
 This script print a namelist format string to stdout.
 
