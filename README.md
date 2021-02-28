@@ -112,8 +112,8 @@ The argument `root` is given as a Hash object. The return value is a string in n
     uppercase:      false
                     true
     
-    separator:      "nl", "\n"
-                    "comma", ","
+    separator:      "comma", ","
+                    "nl", "\n"
 
     group_end:      "slash", "/"
                     "end"
@@ -133,14 +133,14 @@ Example:
 This script print a namelist format string to stdout.
 
     &group1
-      var1 = 11
+      var1 = 11,
       var2 = 12
     /
     &group2
-      var1 = 12
+      var1 = 12,
       var2 = 22
     /
     &group3
-      var1 = 31
+      var1 = 31,
       var2 = 32
     /

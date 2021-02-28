@@ -153,7 +153,7 @@ module FortIO::Namelist
                      array_style: "stream",
                      alignment: "left",
                      uppercase: false,
-                     separator: "\n",
+                     separator: "comma",
                      group_end: "/",
                      indent: '  ',
                      **format_options)

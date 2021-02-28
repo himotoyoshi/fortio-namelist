@@ -71,8 +71,7 @@ rule
 
   rlist : 
                  element
-               | ','       { result = [nil] }
-               | NIL       { result = [nil] }
+               | NIL       { result = [nil, nil] }
                | rlist element
                            { result = val[0] + val[1] }
                | rlist ',' element
@@ -88,8 +87,7 @@ rule
   constant :
                  STRING
                | LOGICAL
-               | DIGITS
-               | FLOAT
+               | real
                | complex
 
   real :
@@ -101,14 +99,13 @@ rule
                            { result = Complex(val[1],val[3]) }
   
   ident_list : 
-                 IDENT     
+                 IDENT     { result = [val[0]] }
+               | STRINGLIKE
                            { result = [val[0]] }
-               | ident_list COMMA IDENT 
+               | ident_list ',' IDENT 
                            { result = val[0] + [val[2]]}
-               | ident_list ',' STRING
+               | ident_list ',' STRINGLIKE
                            { result = val[0] + [val[2]]}
-               | ident_list COMMA
-                           { result = val[0] }
 
   array_spec :
                  DIGITS    { result = [val[0]-1] }
@@ -224,9 +221,9 @@ module FortIO::Namelist
               :FLOAT, 
               @s[0].sub(/D/i,'e').to_f
             ]
-          when @s.scan(/\A\d+[a-z_]\w*/i)         ### STRING
+          when @s.scan(/\A\d+[a-z_]\w*/i)         ### STRING-Like
             return [
-              :STRING,
+              :STRINGLIKE,
               @s[0]
             ]
           when @s.scan(/\A[\-\+]?\d+/)            ### digits
@@ -254,6 +251,11 @@ module FortIO::Namelist
                 ',',
                 nil
               ]
+            elsif @s.match?(/\A[a-z]\w*\s*,/i) 
+              return [
+                ',', 
+                nil
+              ]
             elsif @s.match?(/\A[a-z]\w*/i) or @s.match?(/\A[\&\$\/\!]/)
               return [
                 :COMMA, 
@@ -277,9 +279,9 @@ module FortIO::Namelist
               @s[0], 
               nil
             ]
-          when @s.scan(/\A_\w*/i)                 ### STRING
+          when @s.scan(/\A_\w*/i)                 ### STRING-Like
             return [
-              :STRING,
+              :STRINGLIKE,
               @s[0]
             ]
           when @s.scan(/\A\.t.*?\./i)             ### LOGICAL true
