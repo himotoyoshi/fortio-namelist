@@ -134,5 +134,25 @@ describe FortIO::Namelist do
     is_asserted_by { nml["example"].values == [1,2,3] }
   end
 
+  example "newline before and after equal symbol" do 
+    input = %{
+&example
+  a = 
+  1
+  b 
+  = 2
+  c
+  =
+  3
+/
+}
+    nml = FortIO::Namelist.read(input)
+    is_asserted_by { nml.has_key? "example"  }
+    is_asserted_by { nml["example"].is_a? Hash  }
+    is_asserted_by { nml["example"].keys.size == 3 }
+    is_asserted_by { nml["example"].keys == ["a","b","c"] }
+    is_asserted_by { nml["example"].values == [1,2,3] }
+  end
+
 
 end

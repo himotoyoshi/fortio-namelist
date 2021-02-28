@@ -14,6 +14,10 @@
 
 class FortIO::Namelist::Parser
 
+prechigh
+  left NL
+preclow
+
 rule
 
   namelist : 
@@ -56,14 +60,18 @@ rule
                            { result = val[0] + [val[2]] }
 
   vardef:  
-                 IDENT '=' COMMA
+                 IDENT equal COMMA
                            { result = ParamDef.new(val[0].downcase, nil, "") }
-               | IDENT '=' rvalues 
+               | IDENT equal rvalues 
                            { result = ParamDef.new(val[0].downcase, nil, val[2]) }
-               | IDENT '=' nls rvalues 
-                           { result = ParamDef.new(val[0].downcase, nil, val[3]) }
-               | IDENT '(' array_spec ')' '=' rvalues  
+               | IDENT '(' array_spec ')' equal rvalues  
                            { result = ParamDef.new(val[0].downcase, val[2], val[5]) }
+
+  equal : 
+                 '='
+               | '=' nls
+               | nls '=' 
+               | nls '=' nls
 
   rvalues : 
                 rlist
