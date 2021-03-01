@@ -1,7 +1,7 @@
 require "fortio-namelist"
 require "rspec-power_assert"
 
-describe FortIO::Namelist do
+describe "FortIO::Namelist" do
   
   example "integer" do 
     input = %{
@@ -13,12 +13,12 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == 1  }
-    is_asserted_by { nml["example"]["v2"] == -1  }
-    is_asserted_by { nml["example"]["v3"] == 1  }
-    is_asserted_by { nml["example"]["v4"] == -1  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == 1  }
+    is_asserted_by { nml[:example][:v2] == -1  }
+    is_asserted_by { nml[:example][:v3] == 1  }
+    is_asserted_by { nml[:example][:v4] == -1  }
   end
 
   example "float positive" do 
@@ -36,17 +36,17 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == 1.0  }
-    is_asserted_by { nml["example"]["v2"] == 2.0 }
-    is_asserted_by { nml["example"]["v3"] == 3.0  }
-    is_asserted_by { nml["example"]["v4"] == 4.0 }
-    is_asserted_by { nml["example"]["v5"] == 5.0  }
-    is_asserted_by { nml["example"]["v6"] == 6.0 }
-    is_asserted_by { nml["example"]["v7"] == 7.0  }
-    is_asserted_by { nml["example"]["v8"] == 8.0 }
-    is_asserted_by { nml["example"]["v9"] == 9.0  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == 1.0  }
+    is_asserted_by { nml[:example][:v2] == 2.0 }
+    is_asserted_by { nml[:example][:v3] == 3.0  }
+    is_asserted_by { nml[:example][:v4] == 4.0 }
+    is_asserted_by { nml[:example][:v5] == 5.0  }
+    is_asserted_by { nml[:example][:v6] == 6.0 }
+    is_asserted_by { nml[:example][:v7] == 7.0  }
+    is_asserted_by { nml[:example][:v8] == 8.0 }
+    is_asserted_by { nml[:example][:v9] == 9.0  }
   end
 
   example "float negative" do 
@@ -64,17 +64,17 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == -1.0  }
-    is_asserted_by { nml["example"]["v2"] == -2.0 }
-    is_asserted_by { nml["example"]["v3"] == -3.0  }
-    is_asserted_by { nml["example"]["v4"] == -4.0 }
-    is_asserted_by { nml["example"]["v5"] == -5.0  }
-    is_asserted_by { nml["example"]["v6"] == -6.0 }
-    is_asserted_by { nml["example"]["v7"] == -7.0  }
-    is_asserted_by { nml["example"]["v8"] == -8.0 }
-    is_asserted_by { nml["example"]["v9"] == -9.0  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == -1.0  }
+    is_asserted_by { nml[:example][:v2] == -2.0 }
+    is_asserted_by { nml[:example][:v3] == -3.0  }
+    is_asserted_by { nml[:example][:v4] == -4.0 }
+    is_asserted_by { nml[:example][:v5] == -5.0  }
+    is_asserted_by { nml[:example][:v6] == -6.0 }
+    is_asserted_by { nml[:example][:v7] == -7.0  }
+    is_asserted_by { nml[:example][:v8] == -8.0 }
+    is_asserted_by { nml[:example][:v9] == -9.0  }
   end
 
   example "float 0 start" do 
@@ -84,9 +84,9 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == 1.0  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == 1.0  }
   end
 
   example "string" do 
@@ -98,11 +98,11 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == "string"  }
-    is_asserted_by { nml["example"]["v2"] == "string"  }
-    is_asserted_by { nml["example"]["v3"] == "string"  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == "string"  }
+    is_asserted_by { nml[:example][:v2] == "string"  }
+    is_asserted_by { nml[:example][:v3] == "string"  }
   end
 
   example "without quotation mark" do 
@@ -114,11 +114,11 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == "string"  }
-    is_asserted_by { nml["example"]["v2"] == "_string"  }
-    is_asserted_by { nml["example"]["v3"] == "0_string"  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == "string"  }
+    is_asserted_by { nml[:example][:v2] == "_string"  }
+    is_asserted_by { nml[:example][:v3] == "0_string"  }
   end
 
   example "logical true" do 
@@ -133,14 +133,14 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == true  }
-    is_asserted_by { nml["example"]["v2"] == true  }
-    is_asserted_by { nml["example"]["v3"] == true  }
-    is_asserted_by { nml["example"]["v4"] == true  }
-    is_asserted_by { nml["example"]["v5"] == true  }
-    is_asserted_by { nml["example"]["v6"] == true  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == true  }
+    is_asserted_by { nml[:example][:v2] == true  }
+    is_asserted_by { nml[:example][:v3] == true  }
+    is_asserted_by { nml[:example][:v4] == true  }
+    is_asserted_by { nml[:example][:v5] == true  }
+    is_asserted_by { nml[:example][:v6] == true  }
   end
 
   example "logical false" do 
@@ -155,14 +155,14 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == false  }
-    is_asserted_by { nml["example"]["v2"] == false  }
-    is_asserted_by { nml["example"]["v3"] == false  }
-    is_asserted_by { nml["example"]["v4"] == false  }
-    is_asserted_by { nml["example"]["v5"] == false  }
-    is_asserted_by { nml["example"]["v6"] == false  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == false  }
+    is_asserted_by { nml[:example][:v2] == false  }
+    is_asserted_by { nml[:example][:v3] == false  }
+    is_asserted_by { nml[:example][:v4] == false  }
+    is_asserted_by { nml[:example][:v5] == false  }
+    is_asserted_by { nml[:example][:v6] == false  }
   end
 
   example "complex" do 
@@ -173,10 +173,10 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == 1+1i  }
-    is_asserted_by { nml["example"]["v2"] == 1+1i  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == 1+1i  }
+    is_asserted_by { nml[:example][:v2] == 1+1i  }
   end
 
   example "nil asign" do 
@@ -187,10 +187,10 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"]["v1"] == ""  }
-    is_asserted_by { nml["example"]["v2"] == ""  }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example][:v1] == ""  }
+    is_asserted_by { nml[:example][:v2] == ""  }
   end
 
 end

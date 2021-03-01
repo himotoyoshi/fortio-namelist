@@ -214,7 +214,7 @@ module FortIO
   module Namelist
     class Parser < Racc::Parser
 
-module_eval(<<'...end fortran_namelist.y/module_eval...', 'fortran_namelist.y', 132)
+module_eval(<<'...end fortran_namelist.y/module_eval...', 'fortran_namelist.y', 128)
 
   def parse (str)
     @scan = FortIO::Namelist::Scanner.new(str)
@@ -243,35 +243,35 @@ module_eval(<<'...end fortran_namelist.y/module_eval...', 'fortran_namelist.y', 
 ##### State transition tables begin ###
 
 racc_action_table = [
-    48,    34,    65,    47,     4,     5,    39,    14,    41,    63,
-    42,    43,    46,    49,    48,    66,    62,    47,    15,    13,
-    39,    24,    41,    10,    42,    43,    46,    49,    47,    33,
-    13,    56,    55,    41,    47,    42,    43,    46,    13,    41,
-    47,    42,    43,    46,    29,    59,    30,    42,    43,    46,
-    13,     7,    24,    13,     4,     5,    23,    10,    30,     4,
-     5,    21,    26,    18,     4,     5,    21,    59,    18,    59,
-    24,    46,    51,    46,    13,    13,    57,    58,    61,    24,
+    48,    34,    65,    63,    47,     4,     5,    39,    14,    41,
+    62,    42,    43,    46,    49,    48,    66,    10,    13,    47,
+    15,    13,    39,    29,    41,    30,    42,    43,    46,    49,
+    47,    23,    24,    56,    55,    41,    47,    42,    43,    46,
+    13,    41,    47,    42,    43,    46,    26,    59,    24,    42,
+    43,    46,     4,     5,    21,    10,    13,    18,     4,     5,
+    21,    24,    59,    18,    13,    33,    46,    59,    30,    51,
+     7,    46,     4,     5,    13,    13,    57,    58,    61,    24,
     24,    68,    70,    51,    74,    75,    51 ]
 
 racc_action_check = [
-    28,    28,    57,    28,     0,     0,    28,     6,    28,    51,
-    28,    28,    28,    28,    69,    57,    51,    69,     7,     3,
-    69,    27,    69,     3,    69,    69,    69,    69,    36,    27,
-    10,    36,    36,    36,    55,    36,    36,    36,    21,    55,
-    58,    55,    55,    55,    21,    58,    21,    58,    58,    58,
-    61,     1,    11,    16,     1,     1,    11,    16,    61,     9,
-     9,     9,    19,     9,    25,    25,    25,    47,    25,    68,
-    22,    47,    29,    68,    30,    33,    37,    41,    50,    52,
+    28,    28,    57,    51,    28,     0,     0,    28,     6,    28,
+    51,    28,    28,    28,    28,    69,    57,     3,     3,    69,
+     7,    21,    69,    21,    69,    21,    69,    69,    69,    69,
+    36,    11,    11,    36,    36,    36,    55,    36,    36,    36,
+    10,    55,    58,    55,    55,    55,    19,    58,    22,    58,
+    58,    58,     9,     9,     9,    16,    16,     9,    25,    25,
+    25,    27,    47,    25,    61,    27,    47,    68,    61,    29,
+     1,    68,     1,     1,    30,    33,    37,    41,    50,    52,
     53,    60,    62,    63,    70,    72,    74 ]
 
 racc_action_pointer = [
-     1,    51,   nil,    17,   nil,   nil,     2,    18,   nil,    56,
-    28,    50,   nil,   nil,   nil,   nil,    51,   nil,   nil,    57,
-   nil,    36,    68,   nil,   nil,    61,   nil,    19,    -5,    59,
-    72,   nil,   nil,    73,   nil,   nil,    20,    64,   nil,   nil,
-   nil,    63,   nil,   nil,   nil,   nil,   nil,    54,   nil,   nil,
-    69,    -3,    77,    78,   nil,    26,   nil,    -3,    32,   nil,
-    69,    48,    69,    70,   nil,   nil,   nil,   nil,    56,     9,
+     3,    70,   nil,    12,   nil,   nil,     4,    20,   nil,    50,
+    34,    26,   nil,   nil,   nil,   nil,    50,   nil,   nil,    42,
+   nil,    15,    42,   nil,   nil,    56,   nil,    55,    -4,    56,
+    68,   nil,   nil,    69,   nil,   nil,    22,    64,   nil,   nil,
+   nil,    63,   nil,   nil,   nil,   nil,   nil,    49,   nil,   nil,
+    69,    -9,    73,    74,   nil,    28,   nil,    -2,    34,   nil,
+    69,    58,    69,    70,   nil,   nil,   nil,   nil,    54,    11,
     72,   nil,    76,   nil,    73,   nil,   nil ]
 
 racc_action_default = [
@@ -368,11 +368,11 @@ racc_shift_n = 77
 racc_token_table = {
   false => 0,
   :error => 1,
-  :NL => 2,
-  "&" => 3,
-  "$" => 4,
-  :IDENT => 5,
-  :COMMA => 6,
+  "&" => 2,
+  "$" => 3,
+  :IDENT => 4,
+  :COMMA => 5,
+  :NL => 6,
   "/" => 7,
   "(" => 8,
   ")" => 9,
@@ -410,11 +410,11 @@ Racc_arg = [
 Racc_token_to_s_table = [
   "$end",
   "error",
-  "NL",
   "\"&\"",
   "\"$\"",
   "IDENT",
   "COMMA",
+  "NL",
   "\"/\"",
   "\"(\"",
   "\")\"",
@@ -459,14 +459,14 @@ Racc_debug_parser = false
 
 # reduce 2 omitted
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 28)
+module_eval(<<'.,.,', 'fortran_namelist.y', 24)
   def _reduce_3(val, _values, result)
      @root[val[0]] = val[2]; @scan.in_namelist = nil
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 30)
+module_eval(<<'.,.,', 'fortran_namelist.y', 26)
   def _reduce_4(val, _values, result)
      @root[val[0]] = []; @scan.in_namelist = nil
     result
@@ -477,9 +477,9 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 30)
 
 # reduce 6 omitted
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 38)
+module_eval(<<'.,.,', 'fortran_namelist.y', 34)
   def _reduce_7(val, _values, result)
-     result = val[1].downcase; @scan.in_namelist = val[1].downcase
+     result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern
     result
   end
 .,.,
@@ -502,44 +502,44 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 38)
 
 # reduce 16 omitted
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 56)
+module_eval(<<'.,.,', 'fortran_namelist.y', 52)
   def _reduce_17(val, _values, result)
      raise Racc::ParseError, "\nparse error (&)" unless val[1] =~ /\Aend\Z/i
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 59)
+module_eval(<<'.,.,', 'fortran_namelist.y', 55)
   def _reduce_18(val, _values, result)
      result = [val[0]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 61)
+module_eval(<<'.,.,', 'fortran_namelist.y', 57)
   def _reduce_19(val, _values, result)
      result = val[0] + [val[2]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 65)
+module_eval(<<'.,.,', 'fortran_namelist.y', 61)
   def _reduce_20(val, _values, result)
-     result = ParamDef.new(val[0].downcase, nil, "")
+     result = ParamDef.new(val[0].downcase.intern, nil, "")
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 67)
+module_eval(<<'.,.,', 'fortran_namelist.y', 63)
   def _reduce_21(val, _values, result)
-     result = ParamDef.new(val[0].downcase, nil, val[2])
+     result = ParamDef.new(val[0].downcase.intern, nil, val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 69)
+module_eval(<<'.,.,', 'fortran_namelist.y', 65)
   def _reduce_22(val, _values, result)
-     result = ParamDef.new(val[0].downcase, val[2], val[5])
+     result = ParamDef.new(val[0].downcase.intern, val[2], val[5])
     result
   end
 .,.,
@@ -558,42 +558,42 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 69)
 
 # reduce 29 omitted
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 83)
+module_eval(<<'.,.,', 'fortran_namelist.y', 79)
   def _reduce_30(val, _values, result)
      result = [nil, nil]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 85)
+module_eval(<<'.,.,', 'fortran_namelist.y', 81)
   def _reduce_31(val, _values, result)
      result = val[0] + val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 87)
+module_eval(<<'.,.,', 'fortran_namelist.y', 83)
   def _reduce_32(val, _values, result)
      result = val[0] + val[2]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 89)
+module_eval(<<'.,.,', 'fortran_namelist.y', 85)
   def _reduce_33(val, _values, result)
      result = val[0] + [nil]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 92)
+module_eval(<<'.,.,', 'fortran_namelist.y', 88)
   def _reduce_34(val, _values, result)
      result = [val[0]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 94)
+module_eval(<<'.,.,', 'fortran_namelist.y', 90)
   def _reduce_35(val, _values, result)
      result = [val[2]] * val[0]
     result
@@ -612,63 +612,63 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 94)
 
 # reduce 41 omitted
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 108)
+module_eval(<<'.,.,', 'fortran_namelist.y', 104)
   def _reduce_42(val, _values, result)
      result = Complex(val[1],val[3])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 111)
+module_eval(<<'.,.,', 'fortran_namelist.y', 107)
   def _reduce_43(val, _values, result)
      result = [val[0]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 113)
+module_eval(<<'.,.,', 'fortran_namelist.y', 109)
   def _reduce_44(val, _values, result)
      result = [val[0]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 115)
+module_eval(<<'.,.,', 'fortran_namelist.y', 111)
   def _reduce_45(val, _values, result)
      result = val[0] + [val[2]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 117)
+module_eval(<<'.,.,', 'fortran_namelist.y', 113)
   def _reduce_46(val, _values, result)
      result = val[0] + [val[2]]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 120)
+module_eval(<<'.,.,', 'fortran_namelist.y', 116)
   def _reduce_47(val, _values, result)
      result = [val[0]-1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 122)
+module_eval(<<'.,.,', 'fortran_namelist.y', 118)
   def _reduce_48(val, _values, result)
      result = [(val[0]-1)..(val[2]-1)]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 124)
+module_eval(<<'.,.,', 'fortran_namelist.y', 120)
   def _reduce_49(val, _values, result)
      result = [val[0]-1] + val[2]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'fortran_namelist.y', 126)
+module_eval(<<'.,.,', 'fortran_namelist.y', 122)
   def _reduce_50(val, _values, result)
      result = [(val[0]-1)..(val[2]-1)] + val[4]
     result

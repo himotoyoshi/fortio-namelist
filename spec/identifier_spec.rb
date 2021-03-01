@@ -1,7 +1,7 @@
 require "fortio-namelist"
 require "rspec-power_assert"
 
-describe FortIO::Namelist do
+describe "FortIO::Namelist" do
   
   example "only letter" do 
     input = %{
@@ -12,10 +12,10 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
   end
 
   example "letter number" do 
@@ -27,10 +27,10 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a1","ab12","abc123"] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a1, :ab12, :abc123] }
   end
 
   example "leter number underbar" do 
@@ -42,10 +42,10 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a_1","ab_12","abc_123"] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a_1, :ab_12, :abc_123] }
   end
 
   example "can't start with number" do 
@@ -74,8 +74,8 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml["example"]["t"] == 1 }
-    is_asserted_by { nml["example"]["f"] == 2 }
+    is_asserted_by { nml[:example][:t] == 1 }
+    is_asserted_by { nml[:example][:f] == 2 }
   end
 
 end

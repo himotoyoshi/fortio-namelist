@@ -14,10 +14,6 @@
 
 class FortIO::Namelist::Parser
 
-prechigh
-  left NL
-preclow
-
 rule
 
   namelist : 
@@ -36,9 +32,9 @@ rule
 
   group_header :     
                  group_prefix IDENT 
-                           { result = val[1].downcase; @scan.in_namelist = val[1].downcase }
+                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern }
 
-  separator: 
+  separator :
                  COMMA
                | COMMA nls
                | nls COMMA
@@ -49,25 +45,25 @@ rule
                  NL
                | nls NL
 
-  blank: 
+  blank : 
 
   group_end :    
                  '/'
                | group_prefix IDENT 
                            { raise Racc::ParseError, "\nparse error (&)" unless val[1] =~ /\Aend\Z/i }
 
-  varlist: 
+  varlist : 
                  vardef    { result = [val[0]] }
                | varlist separator vardef
                            { result = val[0] + [val[2]] }
 
-  vardef:  
+  vardef :  
                  IDENT equal COMMA
-                           { result = ParamDef.new(val[0].downcase, nil, "") }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, "") }
                | IDENT equal rvalues 
-                           { result = ParamDef.new(val[0].downcase, nil, val[2]) }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]) }
                | IDENT '(' array_spec ')' equal rvalues  
-                           { result = ParamDef.new(val[0].downcase, val[2], val[5]) }
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]) }
 
   equal : 
                  '='
