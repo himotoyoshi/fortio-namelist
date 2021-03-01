@@ -40,13 +40,15 @@ rule
 
   separator: 
                  COMMA
+               | COMMA nls
+               | nls COMMA
                | nls
                | blank
 
   nls : 
                  NL
                | nls NL
-               
+
   blank: 
 
   group_end :    

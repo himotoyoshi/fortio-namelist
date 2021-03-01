@@ -144,14 +144,18 @@ describe FortIO::Namelist do
   c
   =
   3
+  ,
+  d
+  =
+  4
 /
 }
     nml = FortIO::Namelist.read(input)
     is_asserted_by { nml.has_key? "example"  }
     is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","b","c"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml["example"].keys.size == 4 }
+    is_asserted_by { nml["example"].keys == ["a","b","c","d"] }
+    is_asserted_by { nml["example"].values == [1,2,3,4] }
   end
 
 
