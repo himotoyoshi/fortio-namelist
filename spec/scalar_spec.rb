@@ -126,8 +126,8 @@ describe FortIO::Namelist do
 &example
   v1 = .true.
   v2 = .TRUE.
-  v3 = .t.
-  v4 = .taaa.
+  v3 = .t
+  v4 = .t_0a2
   v5 = t
   v6 = T
 /
@@ -148,8 +148,8 @@ describe FortIO::Namelist do
 &example
   v1 = .false.
   v2 = .FALSE.
-  v3 = .f.
-  v4 = .faaa.
+  v3 = .f
+  v4 = .f_0b2
   v5 = f
   v6 = F
 /
