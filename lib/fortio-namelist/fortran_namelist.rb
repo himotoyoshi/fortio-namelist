@@ -240,9 +240,9 @@ module FortIO::Namelist
     reader = FortIO::Namelist::Reader.new(text)
     case group
     when Array
-      groups = group
-    when String
-      groups = [group]
+      groups = group.map{|s| s.intern }
+    when String, Symbol
+      groups = [group].map{|s| s.intern }
     when nil
       groups = reader.namelist.keys
     else

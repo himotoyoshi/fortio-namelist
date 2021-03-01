@@ -45,14 +45,14 @@ If the keyword argument `group` is omitted, all namelist groups included in `inp
 The Hash object of the return value has a two-level structure as follows.
 
     {
-      "group1" => {
-         "var11" => value11,
-         "var12" => value12, 
+      group1: {
+         var11: value11,
+         var12: value12, 
             :          :
       }
-      "group2" => {
-         "var21" => value21,
-         "var22" => value22,
+      group2: {
+         var21: value21,
+         var22: value22,
             :          :
       }
           :        
@@ -83,18 +83,21 @@ input = %{
 
 ### read all groups
 root = FortIO::Namelist.read(input)
-=> {"group1"=>{"var1"=>11, "var2"=>12},
-    "group2"=>{"var1"=>12, "var2"=>22},
-    "group3"=>{"var1"=>31, "var2"=>32}}
+=> {:group1=>{:var1=>11, :var2=>12},
+    :group2=>{:var1=>12, :var2=>22},
+    :group3=>{:var1=>31, :var2=>32}}
+
 
 ### read only "group2"
 root = FortIO::Namelist.read(input, group: "group2")
-=> {"group2"=>{"var1"=>12, "var2"=>22}}
+=> {:group2=>{:var1=>12, :var2=>22}}
+
 
 ### read only "group1" and "group3"
 root = FortIO::Namelist.read(input, group: ["group1", "group3"])
-=> {"group1"=>{"var1"=>11, "var2"=>12}, 
-    "group3"=>{"var1"=>31, "var2"=>32}}
+=> {:group1=>{:var1=>11, :var2=>12}, 
+    :group3=>{:var1=>31, :var2=>32}}
+
 ```
 
 ### Generating namelist format string from Hash object with namelist structure
@@ -135,9 +138,9 @@ Example:
 ```ruby
 require 'fortio-namelist'
 
-root = {"group1"=>{"var1"=>11, "var2"=>12},
-        "group2"=>{"var1"=>12, "var2"=>22},
-        "group3"=>{"var1"=>31, "var2"=>32}}
+root = {group1: {var1: 11, var2: 12},
+        group2: {var1: 12, var2: 22},
+        group3: {var1: 31, var2: 32}}
 
 puts FortIO::Namelist.dump(root)
 ```

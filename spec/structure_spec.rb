@@ -1,7 +1,7 @@
 require "fortio-namelist"
 require "rspec-power_assert"
 
-describe FortIO::Namelist do
+describe "FortIO::Namelist" do
   
   example "newline enumeration" do 
     input = %{
@@ -12,11 +12,11 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "space enumeration" do 
@@ -24,11 +24,11 @@ describe FortIO::Namelist do
 &example  a = 1  ab = 2  abc = 3 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "space enumeration 2" do 
@@ -38,11 +38,11 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "comma enumeration" do 
@@ -50,11 +50,11 @@ describe FortIO::Namelist do
 &example  a = 1,  ab = 2,  abc = 3 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "comma enumeration 2" do 
@@ -64,11 +64,11 @@ describe FortIO::Namelist do
 /
     }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "comma newline enumeration" do 
@@ -80,11 +80,11 @@ describe FortIO::Namelist do
 /
 }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "last comma is permitted" do 
@@ -96,11 +96,11 @@ describe FortIO::Namelist do
 /
 }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "comma space hybrid" do 
@@ -111,11 +111,11 @@ describe FortIO::Namelist do
 /
 }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "space before and after equal symbol" do 
@@ -127,11 +127,11 @@ describe FortIO::Namelist do
 /
 }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 3 }
-    is_asserted_by { nml["example"].keys == ["a","ab","abc"] }
-    is_asserted_by { nml["example"].values == [1,2,3] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 3 }
+    is_asserted_by { nml[:example].keys == [:a,:ab,:abc] }
+    is_asserted_by { nml[:example].values == [1,2,3] }
   end
 
   example "newline before and after equal symbol" do 
@@ -151,11 +151,11 @@ describe FortIO::Namelist do
 /
 }
     nml = FortIO::Namelist.read(input)
-    is_asserted_by { nml.has_key? "example"  }
-    is_asserted_by { nml["example"].is_a? Hash  }
-    is_asserted_by { nml["example"].keys.size == 4 }
-    is_asserted_by { nml["example"].keys == ["a","b","c","d"] }
-    is_asserted_by { nml["example"].values == [1,2,3,4] }
+    is_asserted_by { nml.has_key? :example  }
+    is_asserted_by { nml[:example].is_a? Hash  }
+    is_asserted_by { nml[:example].keys.size == 4 }
+    is_asserted_by { nml[:example].keys == [:a,:b,:c,:d] }
+    is_asserted_by { nml[:example].values == [1,2,3,4] }
   end
 
 
