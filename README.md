@@ -23,7 +23,14 @@ require "fortio-namelist"
 ```
 
 Usage
------------
+------
+
+### Useful methods
+
+It is enough for the user to remember the following two methods.
+
+    FortIO::Namelist.read(input, group: nil)
+    FortIO::Namelist.dump(root, **format_options)
 
 ### Reading namelist format string
 

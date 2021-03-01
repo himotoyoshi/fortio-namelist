@@ -294,12 +294,12 @@ module FortIO::Namelist
               :STRINGLIKE,
               @s[0]
             ]
-          when @s.scan(/\A\.t.*?\./i)             ### LOGICAL true
+          when @s.scan(/\A\.t[\w\d_]*\.?/i)             ### LOGICAL true
             return [                 
               :LOGICAL,
               true,
             ]
-          when @s.scan(/\A\.f.*?\./i)             ### LOGICAL false
+          when @s.scan(/\A\.f[\w\d_]*\.?/i)             ### LOGICAL false
             return [
               :LOGICAL,
               false,
