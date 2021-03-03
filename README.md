@@ -7,9 +7,9 @@ This is a library for reading and writing data in Fortran's namelist format. Wit
 Features
 --------
 
-* Flexible parsing enables reading of namelists in various formats.
-* Various options to control the output namelist string in the format of your choice.
-* Able to convert namelist format to JSON or YAML format using Ruby's standard library
+* Flexible parsing using Racc to support various dialects
+* Options for controlling the format of the dump
+* Represents the structure of a name list with a Hash object (easy to convert to JSON or YAML format)
 
 Installation
 ------------
@@ -27,14 +27,14 @@ Usage
 
 ### Useful methods
 
-It is enough for the user to remember the following two methods.
+The user only needs to remember the following two methods.
 
     FortIO::Namelist.parse(input, group: nil)
     FortIO::Namelist.dump(root, **format_options)
 
-### Reading namelist format string
+### Reading namelist string
 
-To create a Hash object with namelist structure by reading a string in namelist format, use the following method.
+To create a Hash object with namelist structure by reading a namelist string, use the following method.
 
     FortIO::Namelist.parse(input, group: nil)
 
@@ -87,11 +87,9 @@ root = FortIO::Namelist.read(input)
     :group2=>{:var1=>12, :var2=>22},
     :group3=>{:var1=>31, :var2=>32}}
 
-
 ### read only "group2"
 root = FortIO::Namelist.read(input, group: "group2")
 => {:group2=>{:var1=>12, :var2=>22}}
-
 
 ### read only "group1" and "group3"
 root = FortIO::Namelist.read(input, group: ["group1", "group3"])
@@ -100,13 +98,13 @@ root = FortIO::Namelist.read(input, group: ["group1", "group3"])
 
 ```
 
-### Generating namelist format string from Hash object with namelist structure
+### Generating namelist string from Hash object with namelist structure
 
-To generate a namelist format string from a Hash object with a namelist structure, use the following method.
+To generate a namelist string from a Hash object with a namelist structure, use the following method.
 
     FortIO::Namelist.dump(root, **format_options)
 
-The argument `root` is given as a Hash object. The return value is a string in namelist format. You can finely control the output namelist string with the following keyword arguments (the first one is the default).
+The argument `root` is given as a Hash object. The return value is a namelist string. You can finely control the output namelist string with the following keyword arguments (the first one is the default).
 
     array_style:    'stream'
                     'index'   
