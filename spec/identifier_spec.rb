@@ -11,7 +11,7 @@ describe "FortIO::Namelist" do
   abc = 1
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -26,7 +26,7 @@ describe "FortIO::Namelist" do
   abc123 = 1
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -41,7 +41,7 @@ describe "FortIO::Namelist" do
   abc_123 = 1
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -54,7 +54,7 @@ describe "FortIO::Namelist" do
   1a = 1
 /
     }
-    expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError)
   end
 
   example "can't start with underscore" do 
@@ -63,7 +63,7 @@ describe "FortIO::Namelist" do
   _a = 1
 /
     }
-    expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError)
   end
 
   example "t and f can be used as indentifier" do 
@@ -73,7 +73,7 @@ describe "FortIO::Namelist" do
   f = 2
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml[:example][:t] == 1 }
     is_asserted_by { nml[:example][:f] == 2 }
   end

@@ -11,7 +11,7 @@ describe "FortIO::Namelist" do
   abc = 3
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -23,7 +23,7 @@ describe "FortIO::Namelist" do
     input = %{
 &example  a = 1  ab = 2  abc = 3 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -37,7 +37,7 @@ describe "FortIO::Namelist" do
   a = 1  ab = 2  abc = 3
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -49,7 +49,7 @@ describe "FortIO::Namelist" do
     input = %{
 &example  a = 1,  ab = 2,  abc = 3 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -63,7 +63,7 @@ describe "FortIO::Namelist" do
   a = 1,  ab = 2,  abc = 3
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -79,7 +79,7 @@ describe "FortIO::Namelist" do
   abc = 3
 /
 }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -95,7 +95,7 @@ describe "FortIO::Namelist" do
   abc = 3,
 /
 }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -110,7 +110,7 @@ describe "FortIO::Namelist" do
   abc = 3
 /
 }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -126,7 +126,7 @@ describe "FortIO::Namelist" do
   abc =3
 /
 }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 3 }
@@ -150,7 +150,7 @@ describe "FortIO::Namelist" do
   4
 /
 }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].keys.size == 4 }

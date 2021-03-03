@@ -10,7 +10,7 @@ describe "FortIO::Namelist" do
   v2 = 6,7,8,9,10,
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [1,2,3,4,5]  }
@@ -21,7 +21,7 @@ describe "FortIO::Namelist" do
     input = %{
 &example v1 = 1,2,3,4,5, v2 = 6,7,8,9,10, /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [1,2,3,4,5]  }
@@ -40,7 +40,7 @@ describe "FortIO::Namelist" do
   v2(3:5) = 8,9,10,
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [1,2,3,4,5]  }
@@ -55,7 +55,7 @@ describe "FortIO::Namelist" do
   v2(3:5) = 8,9,10,
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [nil,2,nil,nil,5]  }
@@ -68,7 +68,7 @@ describe "FortIO::Namelist" do
   v1(2) = 2,3,4,5
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [nil,2,3,4,5]  }
@@ -83,7 +83,7 @@ describe "FortIO::Namelist" do
   v4 = 5 * f
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [2,2,2,2,2]  }
@@ -98,7 +98,7 @@ describe "FortIO::Namelist" do
   v1 = "a",'b',"c"
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == ["a","b","c"]  }
@@ -110,7 +110,7 @@ describe "FortIO::Namelist" do
   v1 = a, b, c
 /
     }
-    expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError)
   end
 
   example "array of identifier 2" do 
@@ -119,7 +119,7 @@ describe "FortIO::Namelist" do
   v1 = a, 0_b, _c
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == ["a","0_b","_c"]  }
@@ -131,7 +131,7 @@ describe "FortIO::Namelist" do
   v1 = "a", b, "c"
 /
     }
-    expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError)
   end
 
   example "don't permit to mix identifier and string in array stream 2" do 
@@ -140,7 +140,7 @@ describe "FortIO::Namelist" do
   v1 = a, "b", c
 /
     }
-    expect { FortIO::Namelist.read(input) }.to raise_error(RuntimeError)
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError)
   end
 
   example "empty element" do 
@@ -150,7 +150,7 @@ describe "FortIO::Namelist" do
   v2 = , , 3, , 5
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == [nil, nil, 3, nil, 5]  }

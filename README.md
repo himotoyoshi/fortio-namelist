@@ -29,20 +29,20 @@ Usage
 
 It is enough for the user to remember the following two methods.
 
-    FortIO::Namelist.read(input, group: nil)
+    FortIO::Namelist.parse(input, group: nil)
     FortIO::Namelist.dump(root, **format_options)
 
 ### Reading namelist format string
 
-To create a Hash object with Namelist structure by reading a string in namelist format, use the following method.
+To create a Hash object with namelist structure by reading a string in namelist format, use the following method.
 
-    FortIO::Namelist.read(input, group: nil)
+    FortIO::Namelist.parse(input, group: nil)
 
-The argument `input` is given as a string, but it also accepts objects with a method `#read` returns a string like an IO object. 
+The argument `input` is given as a string, but it also accepts objects with a method `#read` returns a string like an IO object ('duck typing'). 
 
 If the keyword argument `group` is omitted, all namelist groups included in `input` will be read. To read only a specific group, give a group name to `group`. To load multiple groups, give an array of group names to `group`.
 
-The Hash object of the return value has a two-level structure as follows.
+Use lowercase Symbol objects for both group and variable names. The Hash object of the return value has a two-level structure as follows.
 
     {
       group1: {
@@ -59,7 +59,7 @@ The Hash object of the return value has a two-level structure as follows.
           :
     }
 
-Group names and variable names are given as String objects. The value is Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case of an array, it will be an Array object with the above objects as elements.
+The value can be Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case that the value is an array, it will be expressed as an Array in Ruby.
 
 Example:
 

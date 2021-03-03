@@ -12,7 +12,7 @@ describe "FortIO::Namelist" do
   v4 = -01
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == 1  }
@@ -35,7 +35,7 @@ describe "FortIO::Namelist" do
   v9 = 90.0d-01
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == 1.0  }
@@ -63,7 +63,7 @@ describe "FortIO::Namelist" do
   v9 = -90.0d-01
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == -1.0  }
@@ -83,7 +83,7 @@ describe "FortIO::Namelist" do
   v1 = 01.0
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == 1.0  }
@@ -97,7 +97,7 @@ describe "FortIO::Namelist" do
   v3 = string
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == "string"  }
@@ -113,7 +113,7 @@ describe "FortIO::Namelist" do
   v3 = 0_string
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == "string"  }
@@ -132,7 +132,7 @@ describe "FortIO::Namelist" do
   v6 = T
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == true  }
@@ -154,7 +154,7 @@ describe "FortIO::Namelist" do
   v6 = F
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == false  }
@@ -172,7 +172,7 @@ describe "FortIO::Namelist" do
   v2 = (1d0,1d0)
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == 1+1i  }
@@ -186,7 +186,7 @@ describe "FortIO::Namelist" do
   v2 = ,
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example][:v1] == ""  }
