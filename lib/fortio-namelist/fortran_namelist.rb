@@ -72,7 +72,7 @@ module FortIO::Namelist
       @namelist = FortIO::Namelist::Parser.new.parse(text)
     end
   
-    def read (group, out={})
+    def parse (group, out={})
       group = group.downcase
       raise "no definition of namelist group '#{group}'" \
                                         unless nml = @namelist[group]
@@ -230,7 +230,7 @@ module FortIO::Namelist
   #
   #  FortIO::Namelist.read(input, name: nil) 
   #
-  def self.read (input, group: nil)
+  def self.parse (input, group: nil)
     case input
     when String
       text = input
@@ -240,9 +240,9 @@ module FortIO::Namelist
     reader = FortIO::Namelist::Reader.new(text)
     case group
     when Array
-      groups = group
-    when String
-      groups = [group]
+      groups = group.map{|s| s.intern }
+    when String, Symbol
+      groups = [group].map{|s| s.intern }
     when nil
       groups = reader.namelist.keys
     else
@@ -250,8 +250,12 @@ module FortIO::Namelist
     end
     return groups.each_with_object({}) { |group, root|
       root[group] = {}
-      reader.read(group, root[group])
-    }
+      reader.parse(group, root[group])
+    }    
+  end
+  
+  def self.read (input, group: nil)
+    parse(input, group: group)
   end
 
   #
@@ -261,7 +265,7 @@ module FortIO::Namelist
   #  return value : namelist string
   #
   def self.filter (input, **format_options)
-    config = read(input)
+    config = parse(input)
     yield config
     return dump(config, **format_options)
   end
