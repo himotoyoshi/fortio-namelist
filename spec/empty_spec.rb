@@ -8,7 +8,7 @@ describe "FortIO::Namelist" do
 &example
 &end
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
     is_asserted_by { nml[:example].is_a? Hash  }
     is_asserted_by { nml[:example].empty?  }
@@ -19,7 +19,7 @@ describe "FortIO::Namelist" do
 $example
 $end
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
   end
 
@@ -28,7 +28,7 @@ $end
 &example
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
   end
 
@@ -38,9 +38,10 @@ $end
   ! this is comment
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
   end
+
 
   example "only newlines" do 
     input = %{
@@ -49,7 +50,7 @@ $end
 
 /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
   end
 
@@ -57,7 +58,7 @@ $end
     input = %{
 &example /
     }
-    nml = FortIO::Namelist.read(input)
+    nml = FortIO::Namelist.parse(input)
     is_asserted_by { nml.has_key? :example  }
   end
   
