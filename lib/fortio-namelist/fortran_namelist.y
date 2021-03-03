@@ -32,38 +32,44 @@ rule
 
   group_header :     
                  group_prefix IDENT 
-                           { result = val[1].downcase; @scan.in_namelist = val[1].downcase }
+                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern }
 
-  separator: 
+  separator :
                  COMMA
+               | COMMA nls
+               | nls COMMA
                | nls
                | blank
 
   nls : 
                  NL
                | nls NL
-               
-  blank: 
+
+  blank : 
 
   group_end :    
                  '/'
                | group_prefix IDENT 
                            { raise Racc::ParseError, "\nparse error (&)" unless val[1] =~ /\Aend\Z/i }
 
-  varlist: 
+  varlist : 
                  vardef    { result = [val[0]] }
                | varlist separator vardef
                            { result = val[0] + [val[2]] }
 
-  vardef:  
-                 IDENT '=' COMMA
-                           { result = ParamDef.new(val[0].downcase, nil, "") }
-               | IDENT '=' rvalues 
-                           { result = ParamDef.new(val[0].downcase, nil, val[2]) }
-               | IDENT '=' nls rvalues 
-                           { result = ParamDef.new(val[0].downcase, nil, val[3]) }
-               | IDENT '(' array_spec ')' '=' rvalues  
-                           { result = ParamDef.new(val[0].downcase, val[2], val[5]) }
+  vardef :  
+                 IDENT equal COMMA
+                           { result = ParamDef.new(val[0].downcase.intern, nil, "") }
+               | IDENT equal rvalues 
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]) }
+               | IDENT '(' array_spec ')' equal rvalues  
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]) }
+
+  equal : 
+                 '='
+               | '=' nls
+               | nls '=' 
+               | nls '=' nls
 
   rvalues : 
                 rlist
@@ -284,12 +290,12 @@ module FortIO::Namelist
               :STRINGLIKE,
               @s[0]
             ]
-          when @s.scan(/\A\.t.*?\./i)             ### LOGICAL true
+          when @s.scan(/\A\.t[\w\d_]*\.?/i)             ### LOGICAL true
             return [                 
               :LOGICAL,
               true,
             ]
-          when @s.scan(/\A\.f.*?\./i)             ### LOGICAL false
+          when @s.scan(/\A\.f[\w\d_]*\.?/i)             ### LOGICAL false
             return [
               :LOGICAL,
               false,

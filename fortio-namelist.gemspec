@@ -1,5 +1,5 @@
 Gem::Specification::new do |s|
-  version = "1.1.0"
+  version = "1.2.1"
   files = Dir.glob("**/*") - [ 
                                Dir.glob("fortio-namelist-*.gem"), 
                                Dir.glob("test/**/*"),
@@ -19,5 +19,6 @@ Gem::Specification::new do |s|
   s.homepage    = 'https://github.com/himotoyoshi/fortio-namelist'
   s.files       = files
   s.required_ruby_version = ">= 2.4.0"
+  s.add_development_dependency "racc", "~> 1.5"
 end
 
