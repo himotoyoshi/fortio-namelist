@@ -97,6 +97,17 @@ module FortIO::Namelist
   # hash -> namelist converter
   #
   
+  def self.float_to_string (value, d:)
+    if value == 0
+      return "0.0"
+    elsif Math.log10(value).between?(-4,4)
+      return "%.16g" % value
+    else
+      num,exp = ("%.16e" % value).split(/e/)
+      return ("%.16g" % num) + d + exp
+    end
+  end
+  
   def self.format_element (value, 
                            logical_format: 'normal', 
                            float_format: 'normal', 
@@ -112,12 +123,13 @@ module FortIO::Namelist
       d = uppercase ? "D" : "d"
       case float_format
       when 'normal'
-        return ("%g" % value).sub(/e/, d)
+        float_to_string(value, d: d)
       when 'd0'
-        value = ("%g" % value)
-        return ( value =~ /e/ ) ? value.sub(/e/, d) : value + d + "0"
+        value = float_to_string(value, d: d)
+        return ( value =~ /#{d}/ ) ? value : value + d + "0"
       when 'exp'
-        return ("%e" % value).sub(/e/, d)
+        num,exp = ("%.16e" % value).split(/e/)
+        return ("%.16g" % num) + d + exp
       else        
         raise "invalid float_format"
       end
@@ -191,23 +203,46 @@ module FortIO::Namelist
       raise "invalid keyword argument `separator` (should be 'comma', ',', 'nl', '\n')"
     end
     case alignment
+    when /\Astream(:(\d+))?/
+      maxlen = $2 ? $2.to_i : 79 - indent.size
+      elements = list.map { |ident, value|
+        format("%s = %s", ident, value)
+      }
+      body = ""
+      line = []
+      len  = indent.size
+      elements.each do |e|
+        if len + e.length >= maxlen
+          body += indent + line.join(", ") + nl
+          line = []
+          len  = indent.size
+        end
+        line << e
+        len += e.length + 2
+      end
+      body += indent + line.join(", ") + nl unless line.empty?
+      body = body.chomp
     when "none"
       body = list.map { |ident, value|
         format("%s%s = %s", indent, ident, value)
       }.join(nl)      
-    when "left"
-      ident_maxlen = list.map{|ident,value| ident.length}.max
+    when /\Aleft(:(\d+))?/
+      if $2
+        ident_maxlen = $2.to_i - indent.size
+      else
+        ident_maxlen = list.map{|ident,value| ident.length}.max
+      end
       body = list.map { |ident, value|
         format("%s%-#{ident_maxlen}s = %s", indent, ident, value)
       }.join(nl)
-    when "right"
-      ident_maxlen = list.map{|ident,value| ident.length}.max
+    when /\Aright(:(\d+))?/
+      if $2
+        ident_maxlen = $2.to_i - indent.size
+      else
+        ident_maxlen = list.map{|ident,value| ident.length}.max
+      end
       body = list.map { |ident, value|
         format("%s%#{ident_maxlen}s = %s", indent, ident, value)
-      }.join(nl)
-    when Integer
-      body = list.map { |ident, value|
-        format("%s%-#{alignment-2}s = %s", indent, ident, value)
       }.join(nl)
     else
       raise "invalid keyword argument `alignment` (should be 'normal' 'left' 'right' 'stream')"  
