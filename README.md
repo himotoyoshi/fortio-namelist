@@ -2,14 +2,16 @@
 fortio-namelist
 ===============
 
-This is a library for reading and writing data in Fortran's namelist format. With this library, you can read Fortran's namelist format data from Ruby and convert it to Hash objects, and vice versa. 
+This is a Ruby library for reading and writing Fortran's namelist. 
+Using this library, you can read a namelist string as a Hash object, 
+or dump a Hash object to a namelist string.
 
 Features
 --------
 
-* Flexible parsing using Racc to support various dialects
-* Options for controlling the format of the dump
-* Represents the structure of a name list with a Hash object (easy to convert to JSON or YAML format)
+* Flexible parsing using Racc
+* Read a namelist string as a Ruby's Hash object (easy to convert to JSON or YAML)
+* Dump a Hash object as namelist string (with )
 
 Installation
 ------------
@@ -137,7 +139,7 @@ This script print a namelist format string to stdout.
 
 You can finely control the output namelist string with the following keyword arguments (the first one is the default).
 
-#### `array_style` : Specifying the notation for array elements
+#### `array_style` specifies the notation for array elements
 
 * 'stream' : (default)
 * 'index'  :
@@ -166,7 +168,7 @@ puts FortIO::Namelist.dump(root, array_style: 'index')
 # /
 ```
 
-#### `logical_format` : Specifying a boolean literal
+#### `logical_format` specifies boolean literals
 
 * 'normal' : normal notation like `.true.`, `.false` (default)
 * 'short'  : short notation like `t`, `f`
@@ -189,7 +191,7 @@ puts FortIO::Namelist.dump(root, logical_format: 'short')
 # /
 ```
 
-#### `float_format` : Specifying notation for floating point numbers
+#### `float_format` specifies the notation for floating point numbers
 
 * 'normal' : format with "%g" (default)
 * 'd0'     : format with "%g" followed by 'd0'
@@ -223,7 +225,7 @@ puts FortIO::Namelist.dump(root, float_format: 'exp')
 # /
 ```
 
-#### `alignment` : Specifying how variable identifiers are aligned
+#### `alignment` specifies how variable identifiers are aligned
 
 * 'left'    : aligned, left-justified, position of '=' can be specified by number eg. 'left:7' (default)
 * 'right'   : aligned, right-justified, position of '=' can be specified by number eg. 'right:7'
@@ -280,7 +282,7 @@ puts FortIO::Namelist.dump(root, alignment: 'stream')
 # /
 ```
 
-#### `uppercase` : Specify whether variable names, etc. should be uppercase or lowercase.
+#### `uppercase` specifies whether variable names, etc. should be uppercase or lowercase.
 
 * false : (default)
 * true  :  
@@ -303,7 +305,7 @@ puts FortIO::Namelist.dump(root, uppercase: true)
 # /
 ```
 
-#### `separator` :  Specifying the separator between variable definitions
+#### `separator` specifies the separator between variable definitions
 
 * "comma", "," : comma + NL separeted (default)
 * "nl", "\n"   : NL separated
@@ -339,7 +341,7 @@ puts FortIO::Namelist.dump(root, separator: "nl")
 # /
 ```
 
-#### `group_end` : Specifying a group terminator
+#### `group_end` specifies the group terminator
 
 * "slash", "/" : end with `/` (default)
 * "end"        : end with `&end`
@@ -362,7 +364,7 @@ puts FortIO::Namelist.dump(root, group_end: 'end')
 # &end
 ```
 
-#### `indent` : Specifying the indentation for variable definition
+#### `indent` specifies the indentation for variable definition
                     
 * ' '*2 : two spaces (default)
 

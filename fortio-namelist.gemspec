@@ -13,7 +13,7 @@ Gem::Specification::new do |s|
     A library for reading/writing fortran namelist file
   HERE
   s.version     = version
-  s.licenses    = ['MIT']
+  s.license     = 'MIT'
   s.author      = "Hiroki Motoyoshi"
   s.email       = ""
   s.homepage    = 'https://github.com/himotoyoshi/fortio-namelist'
