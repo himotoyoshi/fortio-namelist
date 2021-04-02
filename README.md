@@ -137,7 +137,7 @@ This script print a namelist format string to stdout.
 
 You can finely control the output namelist string with the following keyword arguments (the first one is the default).
 
-#### `array_style`
+#### `array_style` : Specifying the notation for array elements
 
 * 'stream' : (default)
 * 'index'  :
@@ -166,10 +166,10 @@ puts FortIO::Namelist.dump(root, array_style: 'index')
 # /
 ```
 
-#### `logical_format`
+#### `logical_format` : Specifying a boolean literal
 
-* 'normal' : (default)
-* 'short'
+* 'normal' : normal notation like `.true.`, `.false` (default)
+* 'short'  : short notation like `t`, `f`
 
 ```ruby
 root = {group: {var1: true, var2: false}}
@@ -184,16 +184,16 @@ puts FortIO::Namelist.dump(root, logical_format: 'normal')
 puts FortIO::Namelist.dump(root, logical_format: 'short')
 # =>
 # &group
-#   var1 = .true.,
-#   var2 = .false.
+#   var1 = t,
+#   var2 = f
 # /
 ```
 
-#### `float_format`
+#### `float_format` : Specifying notation for floating point numbers
 
-* 'normal'
-* 'd0'
-* 'exp'
+* 'normal' : format with "%g" (default)
+* 'd0'     : format with "%g" followed by 'd0'
+* 'exp'    : exponential notation
 
 ```ruby
 root = {group: {var1: 1.0, var2: 12.75, var3: 50.0e-8}}
@@ -223,12 +223,12 @@ puts FortIO::Namelist.dump(root, float_format: 'exp')
 # /
 ```
 
-#### `alignment`
+#### `alignment` : Specifying how variable identifiers are aligned
 
-* 'left'    : eg. 'left:7' (default)
-* 'right'   : eg. 'right:7'
-* 'none'    : 
-* 'stream'  : eg. 'stream:70'
+* 'left'    : aligned, left-justified, position of '=' can be specified by number eg. 'left:7' (default)
+* 'right'   : aligned, right-justified, position of '=' can be specified by number eg. 'right:7'
+* 'none'    : not aligned
+* 'stream'  : not aligned, stream style, length of each line can be specified by number eg. 'stream:70'
 
 ```ruby
 root = {group: {var1: 1, variable2: [1,2,3], v3: true}}
@@ -280,7 +280,7 @@ puts FortIO::Namelist.dump(root, alignment: 'stream')
 # /
 ```
 
-#### `uppercase`
+#### `uppercase` : Specify whether variable names, etc. should be uppercase or lowercase.
 
 * false : (default)
 * true  :  
@@ -303,10 +303,10 @@ puts FortIO::Namelist.dump(root, uppercase: true)
 # /
 ```
 
-#### `separator`
+#### `separator` :  Specifying the separator between variable definitions
 
-* "comma", ","
-* "nl", "\n"
+* "comma", "," : comma + NL separeted (default)
+* "nl", "\n"   : NL separated
 
 ```ruby
 root = {group1: {var1: 1, var2: "a", var3: true},
@@ -339,10 +339,10 @@ puts FortIO::Namelist.dump(root, separator: "nl")
 # /
 ```
 
-#### `group_end`
+#### `group_end` : Specifying a group terminator
 
-* "slash", "/" : 
-* "end"        :
+* "slash", "/" : end with `/` (default)
+* "end"        : end with `&end`
 
 ```ruby
 root = {group: {var1: true, var2: false}}
@@ -362,9 +362,9 @@ puts FortIO::Namelist.dump(root, group_end: 'end')
 # &end
 ```
 
-#### `indent`
+#### `indent` : Specifying the indentation for variable definition
                     
-* ' '*2
+* ' '*2 : two spaces (default)
 
 ```ruby
 root = {group: {var1: true, var2: false}}
