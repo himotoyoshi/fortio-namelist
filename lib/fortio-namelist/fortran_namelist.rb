@@ -98,14 +98,7 @@ module FortIO::Namelist
   #
   
   def self.float_to_string (value, d:)
-    if value == 0
-      return "0.0"
-    elsif Math.log10(value).between?(-4,4)
-      return "%.16g" % value
-    else
-      num,exp = ("%.16e" % value).split(/e/)
-      return ("%.16g" % num) + d + exp
-    end
+    return value.to_s.sub(/e/, d)
   end
   
   def self.format_element (value, 
