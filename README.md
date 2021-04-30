@@ -84,17 +84,17 @@ input = %{
 }
 
 ### read all groups
-root = FortIO::Namelist.read(input)
+root = FortIO::Namelist.parse(input)
 # => {:group1=>{:var1=>11, :var2=>12},
 #     :group2=>{:var1=>12, :var2=>22},
 #     :group3=>{:var1=>31, :var2=>32}}
 
 ### read only "group2"
-root = FortIO::Namelist.read(input, group: "group2")
+root = FortIO::Namelist.parse(input, group: "group2")
 # => {:group2=>{:var1=>12, :var2=>22}}
 
 ### read only "group1" and "group3"
-root = FortIO::Namelist.read(input, group: ["group1", "group3"])
+root = FortIO::Namelist.parse(input, group: ["group1", "group3"])
 # => {:group1=>{:var1=>11, :var2=>12}, 
 #     :group3=>{:var1=>31, :var2=>32}}
 
