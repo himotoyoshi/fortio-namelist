@@ -10,7 +10,9 @@ Gem::Specification::new do |s|
   s.name        = "fortio-namelist"
   s.summary     = "A library for reading/writing fortran namelist file"
   s.description = <<-HERE
-    A library for reading/writing fortran namelist file
+  This is a Ruby library for reading and writing Fortran's namelist. 
+  This library allows you to read a namelist string as a Hash object, 
+  or dump a Hash object to a namelist string.
   HERE
   s.version     = version
   s.license     = 'MIT'

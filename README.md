@@ -1,17 +1,16 @@
-
 fortio-namelist
 ===============
 
 This is a Ruby library for reading and writing Fortran's namelist. 
-Using this library, you can read a namelist string as a Hash object, 
+This library allows you to read a namelist string as a Hash object, 
 or dump a Hash object to a namelist string.
 
 Features
 --------
 
-* Flexible parsing using Racc
-* Read a namelist string as a Ruby's Hash object (easy to convert to JSON or YAML)
-* Dump a Hash object as namelist string (with )
+* Flexible parsing of (too free) namelist format using Racc
+* Reading namelist string as a Ruby's Hash object
+* Converting a Hash object to a namelist string (specifying the format) 
 
 Installation
 ------------
@@ -29,22 +28,22 @@ Usage
 
 ### Useful methods
 
-The user only needs to remember the following two methods.
+To read and write a namelist, it is sufficient to use only the following two methods.
 
     FortIO::Namelist.parse(input, group: nil)
     FortIO::Namelist.dump(root, **format_options)
 
-### Reading namelist string
+### Reading namelist
 
 To create a Hash object with namelist structure by reading a namelist string, use the following method.
 
     FortIO::Namelist.parse(input, group: nil)
 
-The argument `input` is given as a string, but it also accepts objects with a method `#read` returns a string like an IO object ('duck typing'). 
+The argument `input` is given as a string, but it also accepts objects with a method `#read` which returns a string like an IO object ('duck typing'). 
 
-If the keyword argument `group` is omitted, all namelist groups included in `input` will be read. To read only a specific group, give a group name to `group`. To load multiple groups, give an array of group names to `group`.
+To read only a specific group, give a group name to the keyword argument `group`. If `group` is omitted, all namelist groups included in `input` will be read. To load multiple groups, give an array of group names to `group`.
 
-Use lowercase Symbol objects for both group and variable names. The Hash object of the return value has a two-level structure as follows.
+The Hash object of the return value has a two-level structure as follows.
 
     {
       group1: {
@@ -61,7 +60,7 @@ Use lowercase Symbol objects for both group and variable names. The Hash object 
           :
     }
 
-The value can be Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case that the value is an array, it will be expressed as an Array in Ruby.
+The group and variable names are converted to lowercase Symbol objects and stored as keys in the hash. The value can be Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case that the value is an array, it will be expressed as an Array in Ruby. We chose symbol as the key of the hash object because it is thought to be compatible with the pattern matching introduced in Ruby 2.7.
 
 Example:
 
@@ -138,6 +137,16 @@ This script print a namelist format string to stdout.
 ### Format options for `FortIO::Namelist.dump`
 
 You can finely control the output namelist string with the following keyword arguments (the first one is the default).
+
+* `array_style`    : the notation for array elements
+* `logical_format` : boolean literals
+* `float_format`   : the notation for floating point numbers
+* `alignment`      : how variable identifiers are aligned
+* `uppercase`      : whether variable names, etc. should be uppercase or lowercase.
+* `separator`      : the separator between variable definitions
+* `group_end`      : the group terminator
+* `indent`         : the indentation for variable definition
+
 
 #### `array_style` specifies the notation for array elements
 
