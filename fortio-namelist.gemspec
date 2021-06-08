@@ -1,5 +1,5 @@
 Gem::Specification::new do |s|
-  version = "1.3.0"
+  version = "1.4.0"
   files = Dir.glob("**/*") - [ 
                                Dir.glob("fortio-namelist-*.gem"), 
                                Dir.glob("test/**/*"),
@@ -10,10 +10,12 @@ Gem::Specification::new do |s|
   s.name        = "fortio-namelist"
   s.summary     = "A library for reading/writing fortran namelist file"
   s.description = <<-HERE
-    A library for reading/writing fortran namelist file
+  This is a Ruby library for reading and writing Fortran's namelist. 
+  This library allows you to read a namelist string as a Hash object, 
+  or dump a Hash object to a namelist string.
   HERE
   s.version     = version
-  s.licenses    = ['MIT']
+  s.license     = 'MIT'
   s.author      = "Hiroki Motoyoshi"
   s.email       = ""
   s.homepage    = 'https://github.com/himotoyoshi/fortio-namelist'

@@ -1,15 +1,16 @@
-
 fortio-namelist
 ===============
 
-This is a library for reading and writing data in Fortran's namelist format. With this library, you can read Fortran's namelist format data from Ruby and convert it to Hash objects, and vice versa. 
+This is a Ruby library for reading and writing Fortran's namelist. 
+This library allows you to read a namelist string as a Hash object, 
+or dump a Hash object to a namelist string.
 
 Features
 --------
 
-* Flexible parsing using Racc to support various dialects
-* Options for controlling the format of the dump
-* Represents the structure of a name list with a Hash object (easy to convert to JSON or YAML format)
+* Flexible parsing of (too free) namelist format using Racc
+* Reading namelist string as a Ruby's Hash object
+* Converting a Hash object to a namelist string (specifying the format) 
 
 Installation
 ------------
@@ -27,22 +28,22 @@ Usage
 
 ### Useful methods
 
-The user only needs to remember the following two methods.
+To read and write a namelist, it is sufficient to use only the following two methods.
 
     FortIO::Namelist.parse(input, group: nil)
     FortIO::Namelist.dump(root, **format_options)
 
-### Reading namelist string
+### Reading namelist
 
 To create a Hash object with namelist structure by reading a namelist string, use the following method.
 
     FortIO::Namelist.parse(input, group: nil)
 
-The argument `input` is given as a string, but it also accepts objects with a method `#read` returns a string like an IO object ('duck typing'). 
+The argument `input` is given as a string, but it also accepts objects with a method `#read` which returns a string like an IO object ('duck typing'). 
 
-If the keyword argument `group` is omitted, all namelist groups included in `input` will be read. To read only a specific group, give a group name to `group`. To load multiple groups, give an array of group names to `group`.
+To read only a specific group, give a group name to the keyword argument `group`. If `group` is omitted, all namelist groups included in `input` will be read. To load multiple groups, give an array of group names to `group`.
 
-Use lowercase Symbol objects for both group and variable names. The Hash object of the return value has a two-level structure as follows.
+The Hash object of the return value has a two-level structure as follows.
 
     {
       group1: {
@@ -59,7 +60,7 @@ Use lowercase Symbol objects for both group and variable names. The Hash object 
           :
     }
 
-The value can be Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case that the value is an array, it will be expressed as an Array in Ruby.
+The group and variable names are converted to lowercase Symbol objects and stored as keys in the hash. The value can be Ruby's String, Integer, Float, Complex, TrueClass, or FalseClass objects, depending on the literal in the namelist. In the case that the value is an array, it will be expressed as an Array in Ruby. We chose symbol as the key of the hash object because it is thought to be compatible with the pattern matching introduced in Ruby 2.7.
 
 Example:
 
@@ -82,17 +83,17 @@ input = %{
 }
 
 ### read all groups
-root = FortIO::Namelist.read(input)
+root = FortIO::Namelist.parse(input)
 # => {:group1=>{:var1=>11, :var2=>12},
 #     :group2=>{:var1=>12, :var2=>22},
 #     :group3=>{:var1=>31, :var2=>32}}
 
 ### read only "group2"
-root = FortIO::Namelist.read(input, group: "group2")
+root = FortIO::Namelist.parse(input, group: "group2")
 # => {:group2=>{:var1=>12, :var2=>22}}
 
 ### read only "group1" and "group3"
-root = FortIO::Namelist.read(input, group: ["group1", "group3"])
+root = FortIO::Namelist.parse(input, group: ["group1", "group3"])
 # => {:group1=>{:var1=>11, :var2=>12}, 
 #     :group3=>{:var1=>31, :var2=>32}}
 
@@ -137,7 +138,17 @@ This script print a namelist format string to stdout.
 
 You can finely control the output namelist string with the following keyword arguments (the first one is the default).
 
-#### `array_style` : Specifying the notation for array elements
+* `array_style`    : the notation for array elements
+* `logical_format` : boolean literals
+* `float_format`   : the notation for floating point numbers
+* `alignment`      : how variable identifiers are aligned
+* `uppercase`      : whether variable names, etc. should be uppercase or lowercase.
+* `separator`      : the separator between variable definitions
+* `group_end`      : the group terminator
+* `indent`         : the indentation for variable definition
+
+
+#### `array_style` specifies the notation for array elements
 
 * 'stream' : (default)
 * 'index'  :
@@ -166,7 +177,7 @@ puts FortIO::Namelist.dump(root, array_style: 'index')
 # /
 ```
 
-#### `logical_format` : Specifying a boolean literal
+#### `logical_format` specifies boolean literals
 
 * 'normal' : normal notation like `.true.`, `.false` (default)
 * 'short'  : short notation like `t`, `f`
@@ -189,7 +200,7 @@ puts FortIO::Namelist.dump(root, logical_format: 'short')
 # /
 ```
 
-#### `float_format` : Specifying notation for floating point numbers
+#### `float_format` specifies the notation for floating point numbers
 
 * 'normal' : format with "%g" (default)
 * 'd0'     : format with "%g" followed by 'd0'
@@ -223,7 +234,7 @@ puts FortIO::Namelist.dump(root, float_format: 'exp')
 # /
 ```
 
-#### `alignment` : Specifying how variable identifiers are aligned
+#### `alignment` specifies how variable identifiers are aligned
 
 * 'left'    : aligned, left-justified, position of '=' can be specified by number eg. 'left:7' (default)
 * 'right'   : aligned, right-justified, position of '=' can be specified by number eg. 'right:7'
@@ -280,7 +291,7 @@ puts FortIO::Namelist.dump(root, alignment: 'stream')
 # /
 ```
 
-#### `uppercase` : Specify whether variable names, etc. should be uppercase or lowercase.
+#### `uppercase` specifies whether variable names, etc. should be uppercase or lowercase.
 
 * false : (default)
 * true  :  
@@ -303,7 +314,7 @@ puts FortIO::Namelist.dump(root, uppercase: true)
 # /
 ```
 
-#### `separator` :  Specifying the separator between variable definitions
+#### `separator` specifies the separator between variable definitions
 
 * "comma", "," : comma + NL separeted (default)
 * "nl", "\n"   : NL separated
@@ -339,7 +350,7 @@ puts FortIO::Namelist.dump(root, separator: "nl")
 # /
 ```
 
-#### `group_end` : Specifying a group terminator
+#### `group_end` specifies the group terminator
 
 * "slash", "/" : end with `/` (default)
 * "end"        : end with `&end`
@@ -362,7 +373,7 @@ puts FortIO::Namelist.dump(root, group_end: 'end')
 # &end
 ```
 
-#### `indent` : Specifying the indentation for variable definition
+#### `indent` specifies the indentation for variable definition
                     
 * ' '*2 : two spaces (default)
 
