@@ -1,5 +1,5 @@
 Gem::Specification::new do |s|
-  version = "1.3.0"
+  version = "1.4.0"
   files = Dir.glob("**/*") - [ 
                                Dir.glob("fortio-namelist-*.gem"), 
                                Dir.glob("test/**/*"),
