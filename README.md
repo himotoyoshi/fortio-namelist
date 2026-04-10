@@ -394,3 +394,44 @@ puts FortIO::Namelist.dump(root, indent: ' '*4)
 #     var2 = .false.
 # /
 ```
+
+### Scanning namelist structure
+
+To get structural information about namelist groups without fully parsing the values, use the following method.
+
+    FortIO::Namelist.scan(input)
+
+The return value is an array of hashes, each describing a namelist group found in the input. Each hash contains the group name (as a lowercase Symbol), the line range (1-based), and a list of variable entries. Each variable entry includes the original variable name (preserving case), the line number, and for array variables, the index.
+
+Example:
+
+```ruby
+require 'fortio-namelist'
+
+input = %{
+&PHYSICS
+  DT = 24
+  DX = 5000
+  ARR(1) = 10
+  ARR(2) = 20
+/
+&RADIATION
+  DTRADS = 312
+/
+}
+
+result = FortIO::Namelist.scan(input)
+# => [{:group=>:physics,
+#       :lines=>2..7,
+#       :variables=>
+#        [{:name=>"DT", :lineno=>3},
+#         {:name=>"DX", :lineno=>4},
+#         {:name=>"ARR", :lineno=>5, :index=>1},
+#         {:name=>"ARR", :lineno=>6, :index=>2}]},
+#      {:group=>:radiation,
+#       :lines=>8..10,
+#       :variables=>
+#        [{:name=>"DTRADS", :lineno=>9}]}]
+```
+
+For array variables with range indices (e.g. `ARR(3:5) = 8, 9, 10`), the `index` is returned as a string like `"3:5"`. Scalar variables do not have an `index` key.
