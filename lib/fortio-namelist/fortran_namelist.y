@@ -22,9 +22,9 @@ rule
 
   group :
                  group_header separator varlist separator group_end
-                           { @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars.uniq } }
+                           { @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars } }
                | group_header separator group_end
-                           { @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: [] } }
+                           { @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: {} } }
 
   group_prefix : 
                  '&' 
@@ -32,7 +32,7 @@ rule
 
   group_header :
                  group_prefix IDENT
-                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = [] }
+                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = {} }
 
   separator :
                  COMMA
@@ -59,11 +59,11 @@ rule
 
   vardef :
                  IDENT equal COMMA
-                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << val[0].downcase.intern }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
                | IDENT equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << val[0].downcase.intern }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
                | IDENT '(' array_spec ')' equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars << val[0].downcase.intern }
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
 
   equal : 
                  '='
@@ -169,9 +169,11 @@ module FortIO::Namelist
     def initialize (text)
       @s = StringScanner.new(text)
       @in_namelist = nil
+      @last_ident_lineno = nil
     end
 
     attr_accessor :in_namelist
+    attr_reader :last_ident_lineno
 
     def current_lineno
       @s.string[0...@s.pos].count("\n") + 1
@@ -313,12 +315,13 @@ module FortIO::Namelist
             @s.scan(/\At/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
+              @last_ident_lineno = current_lineno
               return [
                 :IDENT,
                 ms
               ]
             else
-              return [                 
+              return [
                 :LOGICAL,
                 true,
               ]
@@ -327,17 +330,19 @@ module FortIO::Namelist
             @s.scan(/\Af/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
+              @last_ident_lineno = current_lineno
               return [
                 :IDENT,
                 ms
               ]
             else
-              return [                 
+              return [
                 :LOGICAL,
                 false,
               ]
             end
           when @s.scan(/\A[a-z]\w*/i)             ### IDENT or LOGICAL
+            @last_ident_lineno = current_lineno
             return [
               :IDENT,
               @s[0]

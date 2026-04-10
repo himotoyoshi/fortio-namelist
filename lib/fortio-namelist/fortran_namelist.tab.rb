@@ -20,9 +20,11 @@ module FortIO::Namelist
     def initialize (text)
       @s = StringScanner.new(text)
       @in_namelist = nil
+      @last_ident_lineno = nil
     end
 
     attr_accessor :in_namelist
+    attr_reader :last_ident_lineno
 
     def current_lineno
       @s.string[0...@s.pos].count("\n") + 1
@@ -164,12 +166,13 @@ module FortIO::Namelist
             @s.scan(/\At/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
+              @last_ident_lineno = current_lineno
               return [
                 :IDENT,
                 ms
               ]
             else
-              return [                 
+              return [
                 :LOGICAL,
                 true,
               ]
@@ -178,17 +181,19 @@ module FortIO::Namelist
             @s.scan(/\Af/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
+              @last_ident_lineno = current_lineno
               return [
                 :IDENT,
                 ms
               ]
             else
-              return [                 
+              return [
                 :LOGICAL,
                 false,
               ]
             end
           when @s.scan(/\A[a-z]\w*/i)             ### IDENT or LOGICAL
+            @last_ident_lineno = current_lineno
             return [
               :IDENT,
               @s[0]
@@ -472,14 +477,14 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 24)
   def _reduce_3(val, _values, result)
-     @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars.uniq }
+     @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 26)
   def _reduce_4(val, _values, result)
-     @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: [] }
+     @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: {} }
     result
   end
 .,.,
@@ -490,7 +495,7 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 26)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 34)
   def _reduce_7(val, _values, result)
-     result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = []
+     result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = {}
     result
   end
 .,.,
@@ -536,21 +541,21 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 57)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 61)
   def _reduce_20(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << val[0].downcase.intern
+     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 63)
   def _reduce_21(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << val[0].downcase.intern
+     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 65)
   def _reduce_22(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars << val[0].downcase.intern
+     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
     result
   end
 .,.,
