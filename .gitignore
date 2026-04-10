@@ -1,0 +1,4 @@
+Rakefile
+test/
+work/
+*.gem
