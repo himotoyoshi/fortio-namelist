@@ -13,7 +13,9 @@ describe "FortIO::Namelist.scan" do
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result.size == 1 }
     is_asserted_by { result[0][:group] == :physics }
-    is_asserted_by { result[0][:variables] == [:visc, :diff] }
+    is_asserted_by { result[0][:variables].keys == [:visc, :diff] }
+    is_asserted_by { result[0][:variables][:visc] == 2 }
+    is_asserted_by { result[0][:variables][:diff] == 3 }
     is_asserted_by { result[0][:lines].is_a? Range }
     is_asserted_by { result[0][:lines].first == 1 }
     is_asserted_by { result[0][:lines].last == 4 }
@@ -36,9 +38,9 @@ describe "FortIO::Namelist.scan" do
     is_asserted_by { result[0][:group] == :group1 }
     is_asserted_by { result[1][:group] == :group2 }
     is_asserted_by { result[2][:group] == :group3 }
-    is_asserted_by { result[0][:variables] == [:a] }
-    is_asserted_by { result[1][:variables] == [:b] }
-    is_asserted_by { result[2][:variables] == [:c] }
+    is_asserted_by { result[0][:variables].keys == [:a] }
+    is_asserted_by { result[1][:variables].keys == [:b] }
+    is_asserted_by { result[2][:variables].keys == [:c] }
   end
 
   example "duplicate group names are both returned" do
@@ -54,11 +56,11 @@ describe "FortIO::Namelist.scan" do
     is_asserted_by { result.size == 2 }
     is_asserted_by { result[0][:group] == :grp }
     is_asserted_by { result[1][:group] == :grp }
-    is_asserted_by { result[0][:variables] == [:x] }
-    is_asserted_by { result[1][:variables] == [:y] }
+    is_asserted_by { result[0][:variables].keys == [:x] }
+    is_asserted_by { result[1][:variables].keys == [:y] }
   end
 
-  example "duplicate variable names are deduplicated" do
+  example "duplicate variable names keep first occurrence line" do
     input = <<~NML
       &example
         v1 = 1
@@ -67,7 +69,9 @@ describe "FortIO::Namelist.scan" do
       /
     NML
     result = FortIO::Namelist.scan(input)
-    is_asserted_by { result[0][:variables] == [:v1, :v2] }
+    is_asserted_by { result[0][:variables].keys == [:v1, :v2] }
+    is_asserted_by { result[0][:variables][:v1] == 2 }
+    is_asserted_by { result[0][:variables][:v2] == 4 }
   end
 
   example "empty group has no variables" do
@@ -75,7 +79,7 @@ describe "FortIO::Namelist.scan" do
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result.size == 1 }
     is_asserted_by { result[0][:group] == :example }
-    is_asserted_by { result[0][:variables] == [] }
+    is_asserted_by { result[0][:variables] == {} }
   end
 
   example "empty input returns empty array" do
@@ -88,14 +92,14 @@ describe "FortIO::Namelist.scan" do
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result.size == 1 }
     is_asserted_by { result[0][:group] == :grp }
-    is_asserted_by { result[0][:variables] == [:val] }
+    is_asserted_by { result[0][:variables] == {val: 2} }
   end
 
   example "group name is lowercased" do
     input = "&MyGroup\n  VAR1 = 1\n/\n"
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result[0][:group] == :mygroup }
-    is_asserted_by { result[0][:variables] == [:var1] }
+    is_asserted_by { result[0][:variables].keys == [:var1] }
   end
 
   example "line ranges do not overlap" do
@@ -123,7 +127,9 @@ describe "FortIO::Namelist.scan" do
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result.size == 1 }
     is_asserted_by { result[0][:group] == :physics }
-    is_asserted_by { result[0][:variables] == [:visc, :diff] }
+    is_asserted_by { result[0][:variables].keys == [:visc, :diff] }
+    is_asserted_by { result[0][:variables][:visc] == 4 }
+    is_asserted_by { result[0][:variables][:diff] == 5 }
     is_asserted_by { result[0][:lines].first == 2 }
   end
 
@@ -132,10 +138,10 @@ describe "FortIO::Namelist.scan" do
     result = FortIO::Namelist.scan(input)
     is_asserted_by { result.size == 1 }
     is_asserted_by { result[0][:group] == :example }
-    is_asserted_by { result[0][:variables] == [:v1] }
+    is_asserted_by { result[0][:variables] == {v1: 2} }
   end
 
-  example "array variables" do
+  example "array variables record first occurrence only" do
     input = <<~NML
       &config
         arr(1) = 10
@@ -144,7 +150,9 @@ describe "FortIO::Namelist.scan" do
       /
     NML
     result = FortIO::Namelist.scan(input)
-    is_asserted_by { result[0][:variables] == [:arr, :scalar] }
+    is_asserted_by { result[0][:variables].keys == [:arr, :scalar] }
+    is_asserted_by { result[0][:variables][:arr] == 2 }
+    is_asserted_by { result[0][:variables][:scalar] == 4 }
   end
 
 end
