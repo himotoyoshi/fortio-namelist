@@ -162,6 +162,18 @@ module FortIO::Namelist
                      group_end: "/",
                      indent: '  ',
                      **format_options)
+    unless ["index", "stream"].include?(array_style)
+      raise "invalid keyword argument `array_style` (should be 'index', 'stream')"
+    end
+    unless ["comma", ",", "nl", "\n"].include?(separator)
+      raise "invalid keyword argument `separator` (should be 'comma', ',', 'nl', '\\n')"
+    end
+    unless alignment =~ /\A(stream|left|right|none)(:\d+)?\z/
+      raise "invalid keyword argument `alignment` (should be 'normal' 'left' 'right' 'stream')"
+    end
+    unless ["slash", "/", "end"].include?(group_end)
+      raise "invalid keyword argument `group_end` (should be 'slash', '/', 'end')"
+    end
     format_options[:uppercase] = uppercase
     list = []
     hash.each do |ident, value|
@@ -265,12 +277,13 @@ module FortIO::Namelist
     else
       text = input.read
     end
+    return {} unless text =~ /[\$&]/
     reader = FortIO::Namelist::Reader.new(text)
     case group
     when Array
-      groups = group.map{|s| s.intern }
+      groups = group.map{|s| s.to_s.downcase.intern }
     when String, Symbol
-      groups = [group].map{|s| s.intern }
+      groups = [group].map{|s| s.to_s.downcase.intern }
     when nil
       groups = reader.namelist.keys
     else
@@ -284,6 +297,26 @@ module FortIO::Namelist
   
   def self.read (input, group: nil)
     parse(input, group: group)
+  end
+
+  #
+  #  FortIO::Namelist.scan(input)
+  #
+  #  Returns an array of hashes describing the structure of each
+  #  namelist group found in the input, including group name,
+  #  line range (1-based), and variable names.
+  #
+  def self.scan (input)
+    case input
+    when String
+      text = input
+    else
+      text = input.read
+    end
+    return [] unless text =~ /[\$&]/
+    parser = FortIO::Namelist::Parser.new
+    parser.parse(text)
+    parser.scan_result
   end
 
   #

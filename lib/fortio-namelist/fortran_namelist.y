@@ -20,19 +20,19 @@ rule
                  namelist group
                | group
 
-  group : 
+  group :
                  group_header separator varlist separator group_end
-                           { @root[val[0]] = val[2]; @scan.in_namelist = nil }
+                           { @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars.uniq } }
                | group_header separator group_end
-                           { @root[val[0]] = []; @scan.in_namelist = nil }
+                           { @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: [] } }
 
   group_prefix : 
                  '&' 
                | '$'
 
-  group_header :     
-                 group_prefix IDENT 
-                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern }
+  group_header :
+                 group_prefix IDENT
+                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = [] }
 
   separator :
                  COMMA
@@ -57,13 +57,13 @@ rule
                | varlist separator vardef
                            { result = val[0] + [val[2]] }
 
-  vardef :  
+  vardef :
                  IDENT equal COMMA
-                           { result = ParamDef.new(val[0].downcase.intern, nil, "") }
-               | IDENT equal rvalues 
-                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]) }
-               | IDENT '(' array_spec ')' equal rvalues  
-                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]) }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << val[0].downcase.intern }
+               | IDENT equal rvalues
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << val[0].downcase.intern }
+               | IDENT '(' array_spec ')' equal rvalues
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars << val[0].downcase.intern }
 
   equal : 
                  '='
@@ -126,15 +126,20 @@ end
 
 ---- inner
 
+  attr_reader :scan_result
+
   def parse (str)
     @scan = FortIO::Namelist::Scanner.new(str)
     @root = {}
+    @scan_result = []
+    @current_vars = []
+    @group_start_line = nil
     begin
       @yydebug = true
       do_parse
     rescue Racc::ParseError => err
       message = ""
-      message << "namelist " << err.message[1..-1] 
+      message << "namelist " << err.message
       if @scan.in_namelist and @scan.in_namelist != "dummy"
         message << " in &#{@scan.in_namelist} ... &end"
       end
@@ -167,6 +172,10 @@ module FortIO::Namelist
     end
 
     attr_accessor :in_namelist
+
+    def current_lineno
+      @s.string[0...@s.pos].count("\n") + 1
+    end
 
     def debug_info
       lines  = @s.string.split(/\n/)
