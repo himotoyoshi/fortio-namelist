@@ -484,7 +484,7 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 24)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 26)
   def _reduce_4(val, _values, result)
-     @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: {} }
+     @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: [] }
     result
   end
 .,.,
@@ -495,7 +495,7 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 26)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 34)
   def _reduce_7(val, _values, result)
-     result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = {}
+     result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = []
     result
   end
 .,.,
@@ -541,21 +541,21 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 57)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 61)
   def _reduce_20(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
+     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 63)
   def _reduce_21(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
+     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 65)
   def _reduce_22(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno
+     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0], lineno: @scan.last_ident_lineno, index: idx.size == 1 ? idx[0] : idx.join(",") }
     result
   end
 .,.,

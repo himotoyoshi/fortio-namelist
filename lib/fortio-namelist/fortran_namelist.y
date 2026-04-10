@@ -24,7 +24,7 @@ rule
                  group_header separator varlist separator group_end
                            { @root[val[0]] = val[2]; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: @current_vars } }
                | group_header separator group_end
-                           { @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: {} } }
+                           { @root[val[0]] = []; @scan.in_namelist = nil; @scan_result << { group: val[0], lines: @group_start_line..@scan.current_lineno, variables: [] } }
 
   group_prefix : 
                  '&' 
@@ -32,7 +32,7 @@ rule
 
   group_header :
                  group_prefix IDENT
-                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = {} }
+                           { result = val[1].downcase.intern; @scan.in_namelist = val[1].downcase.intern; @group_start_line = @scan.current_lineno; @current_vars = [] }
 
   separator :
                  COMMA
@@ -59,11 +59,11 @@ rule
 
   vardef :
                  IDENT equal COMMA
-                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno } }
                | IDENT equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno } }
                | IDENT '(' array_spec ')' equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); @current_vars[val[0].downcase.intern] ||= @scan.last_ident_lineno }
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0], lineno: @scan.last_ident_lineno, index: idx.size == 1 ? idx[0] : idx.join(",") } }
 
   equal : 
                  '='
