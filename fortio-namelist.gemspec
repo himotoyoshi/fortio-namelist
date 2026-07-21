@@ -16,8 +16,8 @@ Gem::Specification::new do |s|
   HERE
   s.version     = version
   s.license     = 'MIT'
-  s.author      = "Hiroki Motoyoshi"
-  s.email       = ""
+  s.authors      = ["himotoyoshi"]
+  s.email       = ["himotoyoshi@users.noreply.github.com"]
   s.homepage    = 'https://github.com/himotoyoshi/fortio-namelist'
   s.files       = files
   s.required_ruby_version = ">= 2.4.0"
