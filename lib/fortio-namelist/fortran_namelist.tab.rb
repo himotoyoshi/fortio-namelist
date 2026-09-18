@@ -15,16 +15,34 @@ end
 
 module FortIO::Namelist
 
+  #
+  #  An identifier token that remembers the line it was read from.
+  #
+  #  The line number has to travel with the token: a variable definition is
+  #  reduced only after the parser has read its lookahead token, so asking the
+  #  scanner for its current position at that point may already report the
+  #  next line.
+  #
+  class Identifier < String
+
+    attr_accessor :lineno
+
+  end
+
   class Scanner 
   
     def initialize (text)
       @s = StringScanner.new(text)
       @in_namelist = nil
-      @last_ident_lineno = nil
     end
 
     attr_accessor :in_namelist
-    attr_reader :last_ident_lineno
+
+    def identifier_token (name)
+      ident = FortIO::Namelist::Identifier.new(name)
+      ident.lineno = current_lineno
+      return [:IDENT, ident]
+    end
 
     def current_lineno
       @s.string[0...@s.pos].count("\n") + 1
@@ -166,11 +184,7 @@ module FortIO::Namelist
             @s.scan(/\At/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
-              @last_ident_lineno = current_lineno
-              return [
-                :IDENT,
-                ms
-              ]
+              return identifier_token(ms)
             else
               return [
                 :LOGICAL,
@@ -181,11 +195,7 @@ module FortIO::Namelist
             @s.scan(/\Af/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
-              @last_ident_lineno = current_lineno
-              return [
-                :IDENT,
-                ms
-              ]
+              return identifier_token(ms)
             else
               return [
                 :LOGICAL,
@@ -193,11 +203,7 @@ module FortIO::Namelist
               ]
             end
           when @s.scan(/\A[a-z]\w*/i)             ### IDENT or LOGICAL
-            @last_ident_lineno = current_lineno
-            return [
-              :IDENT,
-              @s[0]
-            ]
+            return identifier_token(@s[0])
           when @s.scan(/\A\n/)                    ### newline
             return [
               :NL,
@@ -206,7 +212,7 @@ module FortIO::Namelist
             next
           when @s.scan(/\A[ \t]+/)                ### blank
             next
-          when @s.scan(/\A![^\n]*?\n/)            ### comment
+          when @s.scan(/\A![^\n]*\n?/)            ### comment
             next
           else
             @s.rest =~ /\A(.*)$/
@@ -541,21 +547,21 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 57)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 61)
   def _reduce_20(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno }
+     result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0].to_s, lineno: val[0].lineno }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 63)
   def _reduce_21(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno }
+     result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0].to_s, lineno: val[0].lineno }
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 65)
   def _reduce_22(val, _values, result)
-     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0], lineno: @scan.last_ident_lineno, index: idx.size == 1 ? idx[0] : idx.join(",") }
+     result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0].to_s, lineno: val[0].lineno, index: idx.size == 1 ? idx[0] : idx.join(",") }
     result
   end
 .,.,
@@ -637,28 +643,28 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 104)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 107)
   def _reduce_43(val, _values, result)
-     result = [val[0]]
+     result = [val[0].to_s]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 109)
   def _reduce_44(val, _values, result)
-     result = [val[0]]
+     result = [val[0].to_s]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 111)
   def _reduce_45(val, _values, result)
-     result = val[0] + [val[2]]
+     result = val[0] + [val[2].to_s]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 113)
   def _reduce_46(val, _values, result)
-     result = val[0] + [val[2]]
+     result = val[0] + [val[2].to_s]
     result
   end
 .,.,

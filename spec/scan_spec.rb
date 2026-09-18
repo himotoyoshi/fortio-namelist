@@ -156,6 +156,81 @@ describe "FortIO::Namelist.scan" do
     is_asserted_by { result[0][:variables][2] == { name: "scalar", lineno: 4 } }
   end
 
+  example "lineno with trailing comments" do
+    input = <<~NML
+      &config
+        a = 1 ! first
+        b = 2 ! second
+        c = 3
+      /
+    NML
+    result = FortIO::Namelist.scan(input)
+    is_asserted_by { result[0][:variables][0] == { name: "a", lineno: 2 } }
+    is_asserted_by { result[0][:variables][1] == { name: "b", lineno: 3 } }
+    is_asserted_by { result[0][:variables][2] == { name: "c", lineno: 4 } }
+    is_asserted_by { result[0][:lines] == (1..5) }
+  end
+
+  example "lineno with full-line and header comments" do
+    input = <<~NML
+      ! leading note
+      &config ! header comment
+        ! a note of its own
+        a = 1 ! trailing
+        arr(2) = 5 ! trailing
+      /
+    NML
+    result = FortIO::Namelist.scan(input)
+    is_asserted_by { result[0][:variables][0] == { name: "a", lineno: 4 } }
+    is_asserted_by { result[0][:variables][1] == { name: "arr", lineno: 5, index: 2 } }
+  end
+
+  example "lineno with '&' continuation lines" do
+    input = <<~NML
+      &config
+        a = 1 &
+      & b = 2
+        c = 3
+      /
+    NML
+    result = FortIO::Namelist.scan(input)
+    is_asserted_by { result[0][:variables][0] == { name: "a", lineno: 2 } }
+    is_asserted_by { result[0][:variables][1] == { name: "b", lineno: 3 } }
+    is_asserted_by { result[0][:variables][2] == { name: "c", lineno: 4 } }
+  end
+
+  example "lineno with two definitions on one line" do
+    input = <<~NML
+      &config
+        a = 1, b = 2
+        c = 3
+      /
+    NML
+    result = FortIO::Namelist.scan(input)
+    is_asserted_by { result[0][:variables][0] == { name: "a", lineno: 2 } }
+    is_asserted_by { result[0][:variables][1] == { name: "b", lineno: 2 } }
+    is_asserted_by { result[0][:variables][2] == { name: "c", lineno: 3 } }
+  end
+
+  example "lineno with a value list spread over several lines" do
+    input = <<~NML
+      &config
+        a = 1, ! a comment
+            2,
+            3
+        b = 4
+      /
+    NML
+    result = FortIO::Namelist.scan(input)
+    is_asserted_by { result[0][:variables][0] == { name: "a", lineno: 2 } }
+    is_asserted_by { result[0][:variables][1] == { name: "b", lineno: 5 } }
+  end
+
+  example "variable name is a plain String" do
+    result = FortIO::Namelist.scan("&config\n  a = 1\n/\n")
+    is_asserted_by { result[0][:variables][0][:name].instance_of?(String) }
+  end
+
   example "array range index" do
     input = <<~NML
       &config

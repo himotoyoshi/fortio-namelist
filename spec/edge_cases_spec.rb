@@ -229,6 +229,18 @@ describe "FortIO::Namelist edge cases" do
       is_asserted_by { nml[:example][:v2] == 2 }
     end
 
+    example "comment does not break a value list continued on the next line" do
+      input = "&example\n  v1 = 1 ! a comment\n  2\n/\n"
+      nml = FortIO::Namelist.parse(input)
+      is_asserted_by { nml[:example][:v1] == [1, 2] }
+    end
+
+    example "comment at end of input without a newline" do
+      input = "&example\n  v1 = 1\n/\n! trailing comment"
+      nml = FortIO::Namelist.parse(input)
+      is_asserted_by { nml[:example][:v1] == 1 }
+    end
+
     example "comment before group" do
       input = "! header comment\n&example\n  v1 = 1\n/\n"
       nml = FortIO::Namelist.parse(input)

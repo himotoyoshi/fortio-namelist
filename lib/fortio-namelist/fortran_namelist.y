@@ -59,11 +59,11 @@ rule
 
   vardef :
                  IDENT equal COMMA
-                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno } }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, ""); @current_vars << { name: val[0].to_s, lineno: val[0].lineno } }
                | IDENT equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0], lineno: @scan.last_ident_lineno } }
+                           { result = ParamDef.new(val[0].downcase.intern, nil, val[2]); @current_vars << { name: val[0].to_s, lineno: val[0].lineno } }
                | IDENT '(' array_spec ')' equal rvalues
-                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0], lineno: @scan.last_ident_lineno, index: idx.size == 1 ? idx[0] : idx.join(",") } }
+                           { result = ParamDef.new(val[0].downcase.intern, val[2], val[5]); idx = val[2].map { |v| v.is_a?(Range) ? "#{v.first+1}:#{v.last+1}" : v+1 }; @current_vars << { name: val[0].to_s, lineno: val[0].lineno, index: idx.size == 1 ? idx[0] : idx.join(",") } }
 
   equal : 
                  '='
@@ -105,13 +105,13 @@ rule
                            { result = Complex(val[1],val[3]) }
   
   ident_list : 
-                 IDENT     { result = [val[0]] }
+                 IDENT     { result = [val[0].to_s] }
                | STRINGLIKE
-                           { result = [val[0]] }
+                           { result = [val[0].to_s] }
                | ident_list ',' IDENT 
-                           { result = val[0] + [val[2]]}
+                           { result = val[0] + [val[2].to_s]}
                | ident_list ',' STRINGLIKE
-                           { result = val[0] + [val[2]]}
+                           { result = val[0] + [val[2].to_s]}
 
   array_spec :
                  DIGITS    { result = [val[0]-1] }
@@ -164,16 +164,34 @@ end
 
 module FortIO::Namelist
 
+  #
+  #  An identifier token that remembers the line it was read from.
+  #
+  #  The line number has to travel with the token: a variable definition is
+  #  reduced only after the parser has read its lookahead token, so asking the
+  #  scanner for its current position at that point may already report the
+  #  next line.
+  #
+  class Identifier < String
+
+    attr_accessor :lineno
+
+  end
+
   class Scanner 
   
     def initialize (text)
       @s = StringScanner.new(text)
       @in_namelist = nil
-      @last_ident_lineno = nil
     end
 
     attr_accessor :in_namelist
-    attr_reader :last_ident_lineno
+
+    def identifier_token (name)
+      ident = FortIO::Namelist::Identifier.new(name)
+      ident.lineno = current_lineno
+      return [:IDENT, ident]
+    end
 
     def current_lineno
       @s.string[0...@s.pos].count("\n") + 1
@@ -315,11 +333,7 @@ module FortIO::Namelist
             @s.scan(/\At/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
-              @last_ident_lineno = current_lineno
-              return [
-                :IDENT,
-                ms
-              ]
+              return identifier_token(ms)
             else
               return [
                 :LOGICAL,
@@ -330,11 +344,7 @@ module FortIO::Namelist
             @s.scan(/\Af/i)
             ms = @s[0]
             if @s.match?(/\A[ \t]*=/)
-              @last_ident_lineno = current_lineno
-              return [
-                :IDENT,
-                ms
-              ]
+              return identifier_token(ms)
             else
               return [
                 :LOGICAL,
@@ -342,11 +352,7 @@ module FortIO::Namelist
               ]
             end
           when @s.scan(/\A[a-z]\w*/i)             ### IDENT or LOGICAL
-            @last_ident_lineno = current_lineno
-            return [
-              :IDENT,
-              @s[0]
-            ]
+            return identifier_token(@s[0])
           when @s.scan(/\A\n/)                    ### newline
             return [
               :NL,
@@ -355,7 +361,7 @@ module FortIO::Namelist
             next
           when @s.scan(/\A[ \t]+/)                ### blank
             next
-          when @s.scan(/\A![^\n]*?\n/)            ### comment
+          when @s.scan(/\A![^\n]*\n?/)            ### comment
             next
           else
             @s.rest =~ /\A(.*)$/
