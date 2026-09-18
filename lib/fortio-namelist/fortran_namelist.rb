@@ -100,6 +100,26 @@ module FortIO::Namelist
   def self.float_to_string (value, d:)
     return value.to_s.sub(/e/, d)
   end
+
+  #
+  #  The exponential notation of `value`, with the shortest mantissa that still
+  #  reads back as the same Float.
+  #
+  #  Formatting the mantissa in a second step would round it twice: 1.0e-6 is
+  #  9.9999999999999995e-07 in binary, whose mantissa rounds up to 10.
+  #
+  def self.float_to_exponential_string (value, d:)
+    mantissa, exponent = shortest_exponential_notation(value).split(/e/)
+    return mantissa + d + exponent
+  end
+
+  def self.shortest_exponential_notation (value)
+    (0..17).each do |precision|
+      notation = format("%.#{precision}e", value)
+      return notation if notation.to_f == value
+    end
+    return format("%.17e", value)
+  end
   
   def self.format_element (value, 
                            logical_format: 'normal', 
@@ -121,8 +141,7 @@ module FortIO::Namelist
         value = float_to_string(value, d: d)
         return ( value =~ /#{d}/ ) ? value : value + d + "0"
       when 'exp'
-        num,exp = ("%.16e" % value).split(/e/)
-        return ("%.16g" % num) + d + exp
+        return float_to_exponential_string(value, d: d)
       else        
         raise "invalid float_format"
       end
