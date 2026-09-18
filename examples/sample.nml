@@ -1,0 +1,27 @@
+! ---------------------------------------------------------------
+!  sample.nml - a small namelist file used by the example scripts
+! ---------------------------------------------------------------
+
+&model
+  title      = 'Shallow water test run'   ! character
+  nx         = 128                        ! integer
+  ny         = 64
+  dt         = 7.5                        ! real
+  viscosity  = 1.0d-6                     ! real (exponent with 'd')
+  restart    = .false.                    ! logical
+  verbose    = T                          ! logical (short form)
+/
+
+&grid
+  levels     = 10, 20, 30, 40, 50         ! array (stream style)
+  spacing(1) = 1000.0                     ! array (index style)
+  spacing(2) = 2000.0
+  spacing(3) = 4000.0
+  labels     = 'top', 'middle', 'bottom'
+/
+
+&output
+  PATH       = "./out"                    ! upper case names are folded down
+  INTERVAL   = 6
+  FIELDS     = 'u', 'v', 'h'
+/

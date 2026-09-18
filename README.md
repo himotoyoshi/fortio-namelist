@@ -23,6 +23,16 @@ To use the library in your Ruby script,
 require "fortio-namelist"
 ```
 
+Documentation
+-------------
+
+* [User guide](docs/README.md) — installation, reading, writing, format options,
+  scanning, editing, the namelist syntax accepted, troubleshooting, API reference
+* [Examples](examples/README.md) — runnable sample scripts
+
+The section below is a summary; the user guide covers the same ground in more
+detail.
+
 Usage
 ------
 
@@ -212,17 +222,17 @@ root = {group: {var1: 1.0, var2: 12.75, var3: 50.0e-8}}
 puts FortIO::Namelist.dump(root, float_format: 'normal')
 # =>
 # &group
-#   var1 = 1,
+#   var1 = 1.0,
 #   var2 = 12.75,
-#   var3 = 5d-07
+#   var3 = 5.0d-07
 # /
 
 puts FortIO::Namelist.dump(root, float_format: 'd0')
 # =>
 # &group
-#   var1 = 1d0,
+#   var1 = 1.0d0,
 #   var2 = 12.75d0,
-#   var3 = 5d-07
+#   var3 = 5.0d-07
 # /
 
 puts FortIO::Namelist.dump(root, float_format: 'exp')
@@ -303,14 +313,14 @@ puts FortIO::Namelist.dump(root, uppercase: false)
 # =>
 # &group
 #   var1 = 1,
-#   val2 = 'a'
+#   var2 = 'a'
 # /
 
 puts FortIO::Namelist.dump(root, uppercase: true)
 # =>
 # &GROUP
 #   VAR1 = 1,
-#   VAL2 = 'a'
+#   VAR2 = 'a'
 # /
 ```
 
