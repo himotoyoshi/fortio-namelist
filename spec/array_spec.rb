@@ -157,4 +157,44 @@ describe "FortIO::Namelist" do
     is_asserted_by { nml[:example][:v2] == [nil, nil, 3, nil, 5]  }
   end
 
+
+  example "array subscript below 1 is rejected" do
+    ["&example\n  v1(0) = 7\n/\n",
+     "&example\n  v1 = 1, 2, 3\n  v1(0) = 7\n/\n",
+     "&example\n  v1(-1) = 7\n/\n"].each do |input|
+      expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError, /subscript/)
+    end
+  end
+
+  example "array subscript range ending before it starts is rejected" do
+    input = "&example\n  v1(5:3) = 7\n/\n"
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError, /range/)
+  end
+
+  example "negative repeat count is rejected" do
+    input = "&example\n  v1 = -3*1.5\n/\n"
+    expect { FortIO::Namelist.parse(input) }.to raise_error(RuntimeError, /repeat count/)
+  end
+
+  example "zero repeat count gives no element" do
+    nml = FortIO::Namelist.parse("&example\n  v1 = 0*1.5\n/\n")
+    is_asserted_by { nml[:example][:v1] == [] }
+  end
+
+  example "subscript and repeat count are limited by max_array_size" do
+    limit = FortIO::Namelist.max_array_size
+    begin
+      FortIO::Namelist.max_array_size = 100
+      is_asserted_by { FortIO::Namelist.parse("&example\n  v1(100) = 7\n/\n")[:example][:v1].size == 100 }
+      expect {
+        FortIO::Namelist.parse("&example\n  v1(101) = 7\n/\n")
+      }.to raise_error(RuntimeError, /max_array_size/)
+      expect {
+        FortIO::Namelist.parse("&example\n  v1 = 101*1.5\n/\n")
+      }.to raise_error(RuntimeError, /max_array_size/)
+    ensure
+      FortIO::Namelist.max_array_size = limit
+    end
+  end
+
 end

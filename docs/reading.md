@@ -103,6 +103,19 @@ FortIO::Namelist.parse("&g\n v(5) = 7\n/")
 # => {g: {v: [nil, nil, nil, nil, 7]}}
 ```
 
+Subscripts start at 1, as in Fortran. A subscript below 1, or a range that ends
+before it starts, is a parse error rather than something quietly reinterpreted.
+
+Because a variable occupies a Ruby Array as long as its highest subscript, a
+subscript is also capped: `FortIO::Namelist.max_array_size` (one million by
+default) is the largest array a single variable may occupy, and a subscript or
+repeat count beyond it raises. Raise the cap if you really do read arrays that
+large:
+
+```ruby
+FortIO::Namelist.max_array_size = 50_000_000
+```
+
 Index ranges and repeat counts work as expected:
 
 ```ruby

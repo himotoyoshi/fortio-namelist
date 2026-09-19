@@ -12,6 +12,23 @@ require_relative "fortran_namelist.tab"
 
 module FortIO::Namelist
 
+  #
+  #  The largest array a single namelist variable may occupy.
+  #
+  #  An array variable is stored in a Ruby Array as long as its highest
+  #  subscript, so without an upper bound `v(1000000000) = 1` would make a
+  #  30 byte input allocate eight gigabytes. Subscripts and repeat counts
+  #  beyond this raise instead. Raise it if you really do read arrays that
+  #  large.
+  #
+  class << self
+
+    attr_accessor :max_array_size
+
+  end
+
+  self.max_array_size = 1_000_000
+
   class Parser
   
     ParamDef = Struct.new(:ident, :array_spec, :rval)

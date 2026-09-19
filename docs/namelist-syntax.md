@@ -38,6 +38,10 @@ Variable definitions
   var = 1, , 3          ! skipped element, nil in Ruby
 ```
 
+Subscripts are 1-based and must be at least 1; a repeat count must not be
+negative. Both are bounded by `FortIO::Namelist.max_array_size` — see
+[Reading a namelist](reading.md).
+
 A multi-dimensional subscript parses, but the result is not a nested Ruby
 Array: the value is stored in a flat Array at the position of the first
 subscript, so `var(2,3) = 5` gives `{var: [nil, 5]}`. `scan` does report the

@@ -88,7 +88,7 @@ rule
   element :
                  constant  { result = [val[0]] }
                | DIGITS '*' constant
-                           { result = [val[2]] * val[0] }
+                           { result = repeated_element(val[0], val[2]) }
 
   constant :
                  STRING
@@ -114,13 +114,13 @@ rule
                            { result = val[0] + [val[2].to_s]}
 
   array_spec :
-                 DIGITS    { result = [val[0]-1] }
+                 DIGITS    { result = [array_index(val[0])] }
                | DIGITS ':' DIGITS     
-                           { result = [(val[0]-1)..(val[2]-1)] }
+                           { result = [array_index_range(val[0], val[2])] }
                | DIGITS ',' array_spec 
-                           { result = [val[0]-1] + val[2] }
+                           { result = [array_index(val[0])] + val[2] }
                | DIGITS ':' DIGITS ',' array_spec
-                           { result = [(val[0]-1)..(val[2]-1)] + val[4] }
+                           { result = [array_index_range(val[0], val[2])] + val[4] }
 
 end
 
@@ -152,6 +152,45 @@ end
 
   def next_token
     return @scan.yylex
+  end
+
+  #
+  #  Array subscripts are 1-based in a namelist and become 0-based positions
+  #  in a Ruby Array. Without the lower bound, `v(0)` would turn into the Ruby
+  #  index -1 and quietly overwrite the last element of the array.
+  #
+  def array_index (subscript)
+    if subscript < 1
+      raise Racc::ParseError, "parse error: array subscript #{subscript} (subscripts start at 1)"
+    end
+    if subscript > FortIO::Namelist.max_array_size
+      raise Racc::ParseError, "parse error: array subscript #{subscript} " \
+                              "exceeds FortIO::Namelist.max_array_size " \
+                              "(#{FortIO::Namelist.max_array_size})"
+    end
+    return subscript - 1
+  end
+
+  def array_index_range (first, last)
+    if last < first
+      raise Racc::ParseError, "parse error: array subscript range #{first}:#{last} ends before it starts"
+    end
+    return array_index(first)..array_index(last)
+  end
+
+  #
+  #  `n*value` repeats a value n times.
+  #
+  def repeated_element (count, value)
+    if count < 0
+      raise Racc::ParseError, "parse error: repeat count #{count} (repeat counts are not negative)"
+    end
+    if count > FortIO::Namelist.max_array_size
+      raise Racc::ParseError, "parse error: repeat count #{count} " \
+                              "exceeds FortIO::Namelist.max_array_size " \
+                              "(#{FortIO::Namelist.max_array_size})"
+    end
+    return [value] * count
   end
 
 ---- header

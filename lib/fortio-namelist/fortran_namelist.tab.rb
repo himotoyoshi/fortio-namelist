@@ -259,6 +259,45 @@ module_eval(<<'...end fortran_namelist.y/module_eval...', 'fortran_namelist.y', 
     return @scan.yylex
   end
 
+  #
+  #  Array subscripts are 1-based in a namelist and become 0-based positions
+  #  in a Ruby Array. Without the lower bound, `v(0)` would turn into the Ruby
+  #  index -1 and quietly overwrite the last element of the array.
+  #
+  def array_index (subscript)
+    if subscript < 1
+      raise Racc::ParseError, "parse error: array subscript #{subscript} (subscripts start at 1)"
+    end
+    if subscript > FortIO::Namelist.max_array_size
+      raise Racc::ParseError, "parse error: array subscript #{subscript} " \
+                              "exceeds FortIO::Namelist.max_array_size " \
+                              "(#{FortIO::Namelist.max_array_size})"
+    end
+    return subscript - 1
+  end
+
+  def array_index_range (first, last)
+    if last < first
+      raise Racc::ParseError, "parse error: array subscript range #{first}:#{last} ends before it starts"
+    end
+    return array_index(first)..array_index(last)
+  end
+
+  #
+  #  `n*value` repeats a value n times.
+  #
+  def repeated_element (count, value)
+    if count < 0
+      raise Racc::ParseError, "parse error: repeat count #{count} (repeat counts are not negative)"
+    end
+    if count > FortIO::Namelist.max_array_size
+      raise Racc::ParseError, "parse error: repeat count #{count} " \
+                              "exceeds FortIO::Namelist.max_array_size " \
+                              "(#{FortIO::Namelist.max_array_size})"
+    end
+    return [value] * count
+  end
+
 ...end fortran_namelist.y/module_eval...
 ##### State transition tables begin ###
 
@@ -617,7 +656,7 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 88)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 90)
   def _reduce_35(val, _values, result)
-     result = [val[2]] * val[0]
+     result = repeated_element(val[0], val[2])
     result
   end
 .,.,
@@ -671,28 +710,28 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 113)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 116)
   def _reduce_47(val, _values, result)
-     result = [val[0]-1]
+     result = [array_index(val[0])]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 118)
   def _reduce_48(val, _values, result)
-     result = [(val[0]-1)..(val[2]-1)]
+     result = [array_index_range(val[0], val[2])]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 120)
   def _reduce_49(val, _values, result)
-     result = [val[0]-1] + val[2]
+     result = [array_index(val[0])] + val[2]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 122)
   def _reduce_50(val, _values, result)
-     result = [(val[0]-1)..(val[2]-1)] + val[4]
+     result = [array_index_range(val[0], val[2])] + val[4]
     result
   end
 .,.,

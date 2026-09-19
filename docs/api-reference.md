@@ -94,6 +94,14 @@ Value mapping
 | `1, 2, 3` | `Array` | `Array` |
 | skipped element | `nil` | `nil` |
 
+---
+
+### `FortIO::Namelist.max_array_size` / `.max_array_size = n`
+
+The largest array a single variable may occupy; one million by default. An
+array variable is stored in a Ruby Array as long as its highest subscript, so
+this bounds what a subscript or a repeat count can make the parser allocate.
+
 Errors
 ------
 
@@ -103,6 +111,9 @@ All errors raised by this library are `RuntimeError`.
 | --- | --- |
 | `namelist parse error on value ...` | syntax error; the offending lines follow |
 | `namelist parse error ('...')` | unrecognised character; the rest of the line follows |
+| `namelist parse error: array subscript n ...` | a subscript below 1, or one beyond `max_array_size` |
+| `namelist parse error: array subscript range a:b ...` | a range that ends before it starts |
+| `namelist parse error: repeat count n ...` | a negative repeat count, or one beyond `max_array_size` |
 | `no definition of namelist group 'x'` | `group:` named a group not in the input |
 | `invalid keyword argument 'x' (should be ...)` | bad format option value |
 | `invalid logical_format` / `invalid float_format` | bad format option value, raised when such a value is written |

@@ -45,6 +45,25 @@ The scanner hit a character it has no rule for; the text in parentheses is the
 rest of that line. Derived-type syntax (`var%component = 1`) reaches you this
 way.
 
+### `namelist parse error: array subscript ...` / `repeat count ...`
+
+An array subscript below 1, a subscript range that ends before it starts, a
+negative repeat count, or a subscript or repeat count larger than
+`FortIO::Namelist.max_array_size` (one million by default).
+
+The cap exists because a variable occupies a Ruby Array as long as its highest
+subscript: without it, `v(1000000000) = 1` would make a thirty byte input
+allocate eight gigabytes. If your files genuinely contain arrays that large,
+raise it:
+
+```ruby
+FortIO::Namelist.max_array_size = 50_000_000
+```
+
+[`scan`](scanning.md) never builds the values, so it reports the subscripts of a
+file without allocating anything — useful for inspecting a file you do not
+trust yet.
+
 ### `no definition of namelist group 'xxx'`
 
 `parse(input, group: "xxx")` was asked for a group the input does not contain.
