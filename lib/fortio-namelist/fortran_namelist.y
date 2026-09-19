@@ -55,7 +55,7 @@ rule
   varlist : 
                  vardef    { result = [val[0]] }
                | varlist separator vardef
-                           { result = val[0] + [val[2]] }
+                           { result = val[0] << val[2] }
 
   vardef :
                  IDENT equal COMMA
@@ -79,11 +79,11 @@ rule
                  element
                | NIL       { result = [nil, nil] }
                | rlist element
-                           { result = val[0] + val[1] }
+                           { result = val[0].concat(val[1]) }
                | rlist ',' element
-                           { result = val[0] + val[2] }
+                           { result = val[0].concat(val[2]) }
                | rlist NIL
-                           { result = val[0] + [nil] }
+                           { result = val[0] << nil }
 
   element :
                  constant  { result = [val[0]] }
@@ -109,9 +109,9 @@ rule
                | STRINGLIKE
                            { result = [val[0].to_s] }
                | ident_list ',' IDENT 
-                           { result = val[0] + [val[2].to_s]}
+                           { result = val[0] << val[2].to_s }
                | ident_list ',' STRINGLIKE
-                           { result = val[0] + [val[2].to_s]}
+                           { result = val[0] << val[2].to_s }
 
   array_spec :
                  DIGITS    { result = [array_index(val[0])] }
@@ -221,6 +221,8 @@ module FortIO::Namelist
   
     def initialize (text)
       @s = StringScanner.new(text)
+      @counted_pos = 0
+      @counted_lines = 0
       @in_namelist = nil
     end
 
@@ -232,8 +234,17 @@ module FortIO::Namelist
       return [:IDENT, ident]
     end
 
+    #
+    #  Counting the newlines from the start of the text on every call makes
+    #  reading a file quadratic in its length. The scanner only ever moves
+    #  forward, so only the text passed since the last call has to be counted.
+    #
     def current_lineno
-      @s.string[0...@s.pos].count("\n") + 1
+      if @s.pos > @counted_pos
+        @counted_lines += @s.string[@counted_pos...@s.pos].count("\n")
+        @counted_pos = @s.pos
+      end
+      return @counted_lines + 1
     end
 
     def debug_info

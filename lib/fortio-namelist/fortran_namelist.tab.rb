@@ -33,6 +33,8 @@ module FortIO::Namelist
   
     def initialize (text)
       @s = StringScanner.new(text)
+      @counted_pos = 0
+      @counted_lines = 0
       @in_namelist = nil
     end
 
@@ -44,8 +46,17 @@ module FortIO::Namelist
       return [:IDENT, ident]
     end
 
+    #
+    #  Counting the newlines from the start of the text on every call makes
+    #  reading a file quadratic in its length. The scanner only ever moves
+    #  forward, so only the text passed since the last call has to be counted.
+    #
     def current_lineno
-      @s.string[0...@s.pos].count("\n") + 1
+      if @s.pos > @counted_pos
+        @counted_lines += @s.string[@counted_pos...@s.pos].count("\n")
+        @counted_pos = @s.pos
+      end
+      return @counted_lines + 1
     end
 
     def debug_info
@@ -579,7 +590,7 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 55)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 57)
   def _reduce_19(val, _values, result)
-     result = val[0] + [val[2]]
+     result = val[0] << val[2]
     result
   end
 .,.,
@@ -628,21 +639,21 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 79)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 81)
   def _reduce_31(val, _values, result)
-     result = val[0] + val[1]
+     result = val[0].concat(val[1])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 83)
   def _reduce_32(val, _values, result)
-     result = val[0] + val[2]
+     result = val[0].concat(val[2])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 85)
   def _reduce_33(val, _values, result)
-     result = val[0] + [nil]
+     result = val[0] << nil
     result
   end
 .,.,
@@ -696,14 +707,14 @@ module_eval(<<'.,.,', 'fortran_namelist.y', 109)
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 111)
   def _reduce_45(val, _values, result)
-     result = val[0] + [val[2].to_s]
+     result = val[0] << val[2].to_s
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'fortran_namelist.y', 113)
   def _reduce_46(val, _values, result)
-     result = val[0] + [val[2].to_s]
+     result = val[0] << val[2].to_s
     result
   end
 .,.,
